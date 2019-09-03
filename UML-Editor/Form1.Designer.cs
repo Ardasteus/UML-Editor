@@ -28,13 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.Plane = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.Plane)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // Plane
+            // 
+            this.Plane.Location = new System.Drawing.Point(13, 13);
+            this.Plane.Name = "Plane";
+            this.Plane.Size = new System.Drawing.Size(775, 425);
+            this.Plane.TabIndex = 0;
+            this.Plane.TabStop = false;
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.Plane);
+            this.Name = "Form1";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.Plane)).EndInit();
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.PictureBox Plane;
     }
 }
 

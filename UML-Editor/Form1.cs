@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UML_Editor.Rendering;
 
 namespace UML_Editor
 {
@@ -15,6 +16,10 @@ namespace UML_Editor
         public Form1()
         {
             InitializeComponent();
+            Plane.Image = new Bitmap(Plane.Width, Plane.Height);
+            RenderingPlane plane = new RenderingPlane(Plane);
+            plane.DrawArrow(Point.Empty, new Point(100, 100), new Pen(Color.Red,20));
+            plane.Render();
         }
     }
 }
