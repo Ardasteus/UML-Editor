@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UML_Editor.Rendering;
 
 namespace UML_Editor.Rendering.RenderingElements
 {
-    public interface IRenderElement
+    public class RectangleElement : IRenderElement
     {
-        void Render(Renderer renderer);
+        public RectangleElement()
+        {
+
+        }
+        public void Render(Renderer renderer)
+        {
+
+        }
     }
 }

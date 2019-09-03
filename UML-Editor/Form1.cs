@@ -17,8 +17,8 @@ namespace UML_Editor
         {
             InitializeComponent();
             Plane.Image = new Bitmap(Plane.Width, Plane.Height);
-            RenderingPlane plane = new RenderingPlane(Plane);
-            plane.DrawArrow(Point.Empty, new Point(100, 100), new Pen(Color.Red,20));
+            Renderer plane = new Renderer(Plane);
+            plane.DrawLine(Point.Empty, new Point(100, 100), new Pen(Color.Red,20));
             plane.Render();
         }
     }

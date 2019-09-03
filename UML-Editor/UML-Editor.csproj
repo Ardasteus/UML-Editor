@@ -57,9 +57,9 @@
     <Compile Include="Elements\ITypeElement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\Renderer.cs" />
     <Compile Include="Rendering\RenderingElements\IRenderElement.cs" />
-    <Compile Include="Rendering\RenderingPlane.cs" />
+    <Compile Include="Rendering\Renderer.cs" />
+    <Compile Include="Rendering\RenderingElements\LineElement.cs" />
     <Compile Include="Rendering\Vector.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
