@@ -12,6 +12,7 @@ namespace UML_Editor.Rendering.RenderingElements
     {
         public Vector StartPoint { get; set; }
         public Vector EndPoint { get; set; }
+        public Pen DrawPen { get; private set; }
         private int width;
         public int Width
         {
@@ -25,17 +26,17 @@ namespace UML_Editor.Rendering.RenderingElements
                 DrawPen.Width = width; 
             }
         }
-        private Color color;
-        public Color Color
+        private Color pencolor;
+        public Color PenColor
         {
             get
             {
-                return color;
+                return pencolor;
             }
             set
             {
-                color = value;
-                DrawPen.Color = color;
+                pencolor = value;
+                DrawPen.Color = pencolor;
             }
         }
         private DashStyle dashstyle;
@@ -77,7 +78,6 @@ namespace UML_Editor.Rendering.RenderingElements
                 DrawPen.EndCap = endcap;
             }
         }
-        private Pen DrawPen { get; set; }
 
         public LineElement(Vector from, Vector to, int width, Color color)
         {

@@ -33,7 +33,6 @@ namespace UML_Editor.Rendering
             using (Graphics g = GetGraphics())
             {
                 g.DrawLine(draw_pen, from + Origin, to + Origin);
-                draw_pen.Dispose();
             }
         }
 
@@ -44,7 +43,15 @@ namespace UML_Editor.Rendering
 
         public void DrawRectangle(Vector position, int width, int height, Pen draw_pen, Brush fill_brush = null)
         {
-
+            Rectangle rect = new Rectangle(position.X + Origin.X, position.Y + Origin.Y, width, height);
+            using (Graphics g = GetGraphics())
+            {
+                if (fill_brush != null)
+                {
+                    g.FillRectangle(fill_brush, rect);
+                }
+                g.DrawRectangle(draw_pen, rect);
+            }
         }
 
         public void DrawTriangle(Vector A, Vector B, Vector C, Pen draw_pen)
