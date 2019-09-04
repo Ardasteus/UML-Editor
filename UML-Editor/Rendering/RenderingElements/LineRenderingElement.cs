@@ -12,7 +12,7 @@ namespace UML_Editor.Rendering.RenderingElements
     {
         public Vector StartPoint { get; set; }
         public Vector EndPoint { get; set; }
-        public Pen DrawPen { get; private set; }
+        private Pen DrawPen { get; set; }
         private int width;
         public int Width
         {
@@ -26,65 +26,65 @@ namespace UML_Editor.Rendering.RenderingElements
                 DrawPen.Width = width; 
             }
         }
-        private Color pencolor;
-        public Color PenColor
+        private Color color;
+        public Color Color
         {
             get
             {
-                return pencolor;
+                return color;
             }
             set
             {
-                pencolor = value;
-                DrawPen.Color = pencolor;
+                color = value;
+                DrawPen.Color = color;
             }
         }
-        private DashStyle dashstyle;
+        private DashStyle dashStyle;
         public DashStyle DashStyle
         {
             get
             {
-                return dashstyle;
+                return dashStyle;
             }
             set
             {
-                dashstyle = value;
-                DrawPen.DashStyle = dashstyle;
+                dashStyle = value;
+                DrawPen.DashStyle = dashStyle;
             }
         }
-        private LineCap startcap;
+        private LineCap startCap;
         public LineCap StartCap
         {
             get
             {
-                return startcap;
+                return startCap;
             }
             set
             {
-                startcap = value;
-                DrawPen.StartCap = startcap;
+                startCap = value;
+                DrawPen.StartCap = startCap;
             }
         }
-        private LineCap endcap;
+        private LineCap endCap;
         public LineCap EndCap
         {
             get
             {
-                return endcap;
+                return endCap;
             }
             set
             {
-                endcap = value;
-                DrawPen.EndCap = endcap;
+                endCap = value;
+                DrawPen.EndCap = endCap;
             }
         }
 
         public LineElement(Vector from, Vector to, int width, Color color)
         {
+            DrawPen = new Pen(color, width);
             StartPoint = from;
             EndPoint = to;
             Width = width;
-            DrawPen = new Pen(color, width);
         }
 
         public void Render(Renderer renderer)

@@ -54,6 +54,14 @@ namespace UML_Editor.Rendering
             }
         }
 
+        public void DrawText(PointF position, string text, Font font, Brush brush)
+        {
+            using (Graphics g = GetGraphics())
+            {
+                g.DrawString(text, font, brush, position);
+            }
+        }
+
         public void DrawTriangle(Vector A, Vector B, Vector C, Pen draw_pen)
         {
 

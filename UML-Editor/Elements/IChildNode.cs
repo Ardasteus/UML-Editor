@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UML_Editor.Elements
 {
-    public interface IMemberElement : IElement
+    public interface IMemberElement : INode
     {
     }
 }

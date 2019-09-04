@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UML_Editor.Rendering;
+using UML_Editor.Rendering.RenderingElements;
 
 namespace UML_Editor
 {
@@ -18,7 +19,12 @@ namespace UML_Editor
             InitializeComponent();
             Plane.Image = new Bitmap(Plane.Width, Plane.Height);
             Renderer plane = new Renderer(Plane);
-            plane.DrawLine(Point.Empty, new Point(100, 100), new Pen(Color.Red,20));
+            RectangleElement rectangle = new RectangleElement(new Vector(0, 0), 10, 20, Color.White, Color.Black);
+            LineElement line = new LineElement(new Vector(0, 0), new Vector(20, 20), 5, Color.Aqua);
+            TextElement text = new TextElement(new Vector(10, 10), "Hello World", Color.Black);
+            rectangle.Render(plane);
+            line.Render(plane);
+            text.Render(plane);
             plane.Render();
         }
     }

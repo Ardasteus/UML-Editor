@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UML_Editor.Elements
+namespace UML_Editor.Elements.Types
 {
-    interface ITypeElement : IElement
+    public class ClassDiagram
     {
+        public ClassDiagram()
+        {
+
+        }
     }
 }

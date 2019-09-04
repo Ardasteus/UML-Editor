@@ -18,6 +18,8 @@ namespace UML_Editor.Rendering
             Y = y;
         }
 
+        public static Vector Zero = new Vector(0, 0);
+
         public static Vector operator +(Vector left, Vector right)
         {
             return new Vector(right.X + left.X, right.Y + left.Y);
@@ -43,6 +45,15 @@ namespace UML_Editor.Rendering
         public static implicit operator Vector(Point p)
         {
             return new Vector(p.X, p.Y);
+        }
+
+        public static implicit operator PointF(Vector v)
+        {
+            return new PointF(v.X, v.Y);
+        }
+        public static implicit operator Vector(PointF p)
+        {
+            return new Vector((int)p.X, (int)p.Y);
         }
     }
 }
