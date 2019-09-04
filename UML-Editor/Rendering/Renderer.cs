@@ -58,7 +58,7 @@ namespace UML_Editor.Rendering
         {
             using (Graphics g = GetGraphics())
             {
-                g.DrawString(text, font, brush, position);
+                g.DrawString(text, font, brush, position + Origin);
             }
         }
 

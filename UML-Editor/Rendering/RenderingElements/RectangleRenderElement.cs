@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace UML_Editor.Rendering.RenderingElements
 {
-    public class RectangleElement : IRenderElement
+    public class RectangleRenderElement : IRenderElement
     {
         public Vector Position { get; set; }
         public int Width { get; set; }
@@ -53,7 +53,7 @@ namespace UML_Editor.Rendering.RenderingElements
                 DrawPen.Width = borderWidth;
             }
         }
-        public RectangleElement(Vector position, int width, int height, Color fill_color, Color border_color, int border_width = 1)
+        public RectangleRenderElement(Vector position, int width, int height, Color fill_color, Color border_color, int border_width = 1)
         {
             DrawPen = new Pen(border_color, border_width);
             FillBrush = new SolidBrush(fill_color);

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UML_Editor.Elements
+namespace UML_Editor.Nodes
 {
-    public interface IMemberElement : INode
+    public interface IChildNode : INode
     {
     }
 }

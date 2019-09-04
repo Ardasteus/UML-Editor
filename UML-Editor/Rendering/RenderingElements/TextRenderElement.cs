@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace UML_Editor.Rendering.RenderingElements
 {
-    public class TextElement : IRenderElement
+    public class TextRenderElement : IRenderElement
     {
         public Vector Position { get; set; } 
         public string Text { get; set; }
@@ -74,7 +74,7 @@ namespace UML_Editor.Rendering.RenderingElements
             }
         }
 
-        public TextElement(Vector position, string text, Color text_color, string font = "Arial", int size = 14, FontStyle style = FontStyle.Regular)
+        public TextRenderElement(Vector position, string text, Color text_color, string font = "Arial", int size = 14, FontStyle style = FontStyle.Regular)
         {
             Font = new Font(font, size, style);
             Brush = new SolidBrush(text_color);

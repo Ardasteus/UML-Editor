@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
+using UML_Editor.Nodes.Types;
+using UML_Editor.Nodes.Members;
 
 namespace UML_Editor
 {
@@ -19,12 +21,15 @@ namespace UML_Editor
             InitializeComponent();
             Plane.Image = new Bitmap(Plane.Width, Plane.Height);
             Renderer plane = new Renderer(Plane);
-            RectangleElement rectangle = new RectangleElement(new Vector(0, 0), 10, 20, Color.White, Color.Black);
-            LineElement line = new LineElement(new Vector(0, 0), new Vector(20, 20), 5, Color.Aqua);
-            TextElement text = new TextElement(new Vector(10, 10), "Hello World", Color.Black);
-            rectangle.Render(plane);
-            line.Render(plane);
-            text.Render(plane);
+            //RectangleRenderElement rectangle = new RectangleRenderElement(Vector.Zero, 10, 20, Color.White, Color.Black);
+            //LineRenderElement line = new LineRenderElement(Vector.Zero, new Vector(20, 20), 5, Color.Aqua);
+            //TextRenderElement text = new TextRenderElement(Vector.Zero, "Hello World", Color.Black);
+            ClassDiagram classDiagram = new ClassDiagram(Vector.Zero, "12345", 80, 20);
+            classDiagram.Children.Add(new PropertyNode("Test Property", "string", Enums.AccessModifier.Public));
+            foreach (IRenderElement item in classDiagram.GetAllRenderElements())
+            {
+                item.Render(plane);
+            }
             plane.Render();
         }
     }

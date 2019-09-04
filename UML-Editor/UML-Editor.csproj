@@ -46,23 +46,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Elements\Types\ClassDiagram.cs" />
+    <Compile Include="Enums\AccessModifiers.cs" />
+    <Compile Include="Nodes\Members\PropertyNode.cs" />
+    <Compile Include="Nodes\Types\ClassDiagram.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Elements\IElement.cs" />
-    <Compile Include="Elements\IMemberElement.cs" />
-    <Compile Include="Elements\ITypeElement.cs" />
+    <Compile Include="Nodes\INode.cs" />
+    <Compile Include="Nodes\IChildNode.cs" />
+    <Compile Include="Nodes\IParentNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\RenderingElements\IRenderElement.cs" />
     <Compile Include="Rendering\Renderer.cs" />
-    <Compile Include="Rendering\RenderingElements\LineElement.cs" />
-    <Compile Include="Rendering\RenderingElements\RectangleElement.cs" />
-    <Compile Include="Rendering\RenderingElements\TextElement.cs" />
+    <Compile Include="Rendering\RenderingElements\LineRenderElement.cs" />
+    <Compile Include="Rendering\RenderingElements\RectangleRenderElement.cs" />
+    <Compile Include="Rendering\RenderingElements\TextRenderElement.cs" />
     <Compile Include="Rendering\Vector.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -89,8 +91,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Elements\Members\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

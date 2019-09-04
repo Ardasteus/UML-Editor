@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 
 namespace UML_Editor.Rendering.RenderingElements
 {
-    public class LineElement : IRenderElement
+    public class LineRenderElement : IRenderElement
     {
         public Vector StartPoint { get; set; }
         public Vector EndPoint { get; set; }
@@ -79,7 +79,7 @@ namespace UML_Editor.Rendering.RenderingElements
             }
         }
 
-        public LineElement(Vector from, Vector to, int width, Color color)
+        public LineRenderElement(Vector from, Vector to, int width, Color color)
         {
             DrawPen = new Pen(color, width);
             StartPoint = from;

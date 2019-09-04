@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UML_Editor.Elements.Types
+namespace UML_Editor.Enums
 {
-    public class ClassDiagram
+    public enum AccessModifier
     {
-        public ClassDiagram()
-        {
-
-        }
+        Private,
+        Public,
+        Protected
     }
 }
