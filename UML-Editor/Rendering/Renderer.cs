@@ -76,5 +76,7 @@ namespace UML_Editor.Rendering
         {
             return Graphics.FromImage(plane.Image);
         }
+
+        public static readonly int TextGap = 10;
     }
 }
