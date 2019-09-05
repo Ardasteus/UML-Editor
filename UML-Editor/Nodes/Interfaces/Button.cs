@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UML_Editor.Nodes
+namespace UML_Editor.Nodes.Interfaces
 {
-    public interface IHandlerNode : INode
+    class Button
     {
-        bool isFocused { get; set; }
     }
 }

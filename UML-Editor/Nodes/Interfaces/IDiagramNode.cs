@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UML_Editor.Nodes
 {
-    public interface IDiagramNode : IRenderableNode
+    public interface IDiagramNode : IRenderableNode, IRelationshipMemberNode
     {
     }
 }

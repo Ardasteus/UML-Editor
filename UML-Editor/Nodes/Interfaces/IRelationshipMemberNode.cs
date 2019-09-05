@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UML_Editor.Nodes.Interfaces
+namespace UML_Editor.Nodes
 {
     public interface IRelationshipMemberNode : INode
     {
