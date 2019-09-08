@@ -39,27 +39,7 @@ namespace UML_Editor.Rendering.RenderingElements
                 Font = new Font(Font, fontStyle);
             }
         }
-        private string fontName;
-        public string FontName
-        {
-            get
-            {
-                return fontName;
-            }
-            set
-            {
-                string temp = fontName;
-                try
-                {
-                    Font = new Font(fontName, FontSize, fontStyle);
-                    fontName = value;
-                }
-                catch
-                {
-                    fontName = temp;
-                }
-            }
-        }
+        public string FontName { get; private set; }
         private Color color;
         public Color Color
         {
@@ -74,14 +54,14 @@ namespace UML_Editor.Rendering.RenderingElements
             }
         }
 
-        public TextRenderElement(Vector position, string text, Color text_color, string font = "Arial", int size = 14, FontStyle style = FontStyle.Regular)
+        public TextRenderElement(Vector position, string text, Color text_color, int size = 14, FontStyle style = FontStyle.Regular)
         {
-            Font = new Font(font, size, style);
+            FontName = "Consolas";
+            Font = new Font(FontName ,size, style);
             Brush = new SolidBrush(text_color);
             Position = position;
             Text = text;
             Color = text_color;
-            FontName = font;
             FontSize = size;
             FontStyle = style;
         }
@@ -89,5 +69,6 @@ namespace UML_Editor.Rendering.RenderingElements
         {
             renderer.DrawText(Position, Text, Font, Brush);
         }
+
     }
 }

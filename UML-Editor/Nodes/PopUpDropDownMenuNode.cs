@@ -8,13 +8,13 @@ using UML_Editor.Rendering.RenderingElements;
 
 namespace UML_Editor.Nodes
 {
-    public class PopUpDropDownMenu : IRenderableNode, IMouseHandlerNode, IKeyboardHandlerNode
+    public class PopUpDropDownMenuNode : IRenderableNode, IMouseHandlerNode, IKeyboardHandlerNode
     {
         public string Name { get; set; }
         public Vector Position { get; set; }
         public List<INode> ChildNodes { get; set; }
-        public int TriggerAreaWidth { get; set; }
-        public int TriggerAreaHeight { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public bool isFocused { get; set; } = false;
 
         public void Generate()

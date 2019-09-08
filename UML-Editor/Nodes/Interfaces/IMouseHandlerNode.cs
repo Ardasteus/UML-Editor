@@ -1,4 +1,4 @@
-﻿using System;
+﻿     using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +9,5 @@ namespace UML_Editor.Nodes
     public interface IMouseHandlerNode : IHandlerNode
     {
         void HandleMouse();
-        int TriggerAreaWidth { get; set; }
-        int TriggerAreaHeight { get; set; }
     }
 }

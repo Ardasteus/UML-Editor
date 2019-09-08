@@ -11,7 +11,7 @@ namespace UML_Editor.Rendering
     public class Renderer
     {
         private PictureBox plane;
-        private Vector Origin;
+        public Vector Origin { get; private set; }
         private int width;
         private int height;
 
@@ -69,7 +69,10 @@ namespace UML_Editor.Rendering
 
         public void Render()
         {
-            plane.Refresh();
+            lock(plane)
+            {
+                plane.Refresh();
+            }
         }
 
         private Graphics GetGraphics()
@@ -77,6 +80,6 @@ namespace UML_Editor.Rendering
             return Graphics.FromImage(plane.Image);
         }
 
-        public static readonly int TextGap = 10;
+        public static readonly int TextWidthGap = 9;
     }
 }

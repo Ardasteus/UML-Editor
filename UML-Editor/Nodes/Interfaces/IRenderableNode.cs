@@ -10,7 +10,6 @@ namespace UML_Editor.Nodes
 {
     public interface IRenderableNode : INode
     {
-        void Generate();
-        void Render(Renderer);
+        void Render(Renderer renderer);
     }
 }

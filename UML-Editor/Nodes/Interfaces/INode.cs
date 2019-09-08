@@ -13,6 +13,7 @@ namespace UML_Editor.Nodes
     {
         string Name { get; set; }
         Vector Position { get; set; }
-        List<INode> ChildNodes { get; set; }
+        int Width { get; set; }
+        int Height { get; set; }
     }
 }

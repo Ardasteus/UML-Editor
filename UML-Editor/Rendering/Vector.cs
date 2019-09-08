@@ -22,20 +22,19 @@ namespace UML_Editor.Rendering
 
         public static Vector operator +(Vector left, Vector right)
         {
-            return new Vector(right.X + left.X, right.Y + left.Y);
+            return new Vector(left.X + right.X, left.Y + right.Y);
         }
         public static Vector operator -(Vector left, Vector right)
         {
-            return new Vector(right.X - left.X, right.Y - left.Y);
+            return new Vector(left.X - right.X, left.Y - right.Y);
         }
-
         public static Vector operator *(Vector left, Vector right)
         {
-            return new Vector(right.X * left.X, right.Y * left.Y);
+            return new Vector(left.X * right.X, left.Y * right.Y);
         }
         public static Vector operator /(Vector left, Vector right)
         {
-            return new Vector(right.X / left.X, right.Y / left.Y);
+            return new Vector(left.X / right.X, left.Y / right.Y);
         }
 
         public static implicit operator Point(Vector v)
@@ -54,6 +53,22 @@ namespace UML_Editor.Rendering
         public static implicit operator Vector(PointF p)
         {
             return new Vector((int)p.X, (int)p.Y);
+        }
+        public static Vector operator +(Vector left, int right)
+        {
+            return new Vector(left.X + right, left.Y + right);
+        }
+        public static Vector operator -(Vector left, int right)
+        {
+            return new Vector(left.X - right, left.Y - right);
+        }
+        public static Vector operator *(Vector left, int right)
+        {
+            return new Vector(left.X * right, left.Y * right);
+        }
+        public static Vector operator /(Vector left, int right)
+        {
+            return new Vector(left.X / right, left.Y / right);
         }
     }
 }
