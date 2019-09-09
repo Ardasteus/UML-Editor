@@ -20,6 +20,6 @@ namespace UML_Editor.Rendering.ElementStyles
         public Color FillColor { get; set; }
         public int BorderWidth { get; set; }
 
-        public RectangleRenderElementStyle Default = new RectangleRenderElementStyle(Color.Black, Color.White, 1);
+        public static RectangleRenderElementStyle Default = new RectangleRenderElementStyle(Color.Black, Color.White, 1);
     }
 }

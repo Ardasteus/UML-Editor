@@ -73,6 +73,7 @@ namespace UML_Editor
                 {
                     FocusedKeyboardNode = n;
                 }
+                node.HandleMouse();
             }
             else
             {

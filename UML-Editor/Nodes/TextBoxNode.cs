@@ -92,6 +92,8 @@ namespace UML_Editor.Nodes
         {
             if (key == (char)8)
                 Text = Text.Substring(0, Text.Length - 1);
+            else if (Char.IsWhiteSpace(key))
+                Text = Text.Insert(Text.Length, " ");
             else if (Char.IsLetter(key))
                 Text = Text.Insert(Text.Length, key.ToString());
         }
