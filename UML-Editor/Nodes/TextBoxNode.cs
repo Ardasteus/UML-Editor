@@ -16,10 +16,10 @@ namespace UML_Editor.Nodes
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Position = position ?? throw new ArgumentNullException(nameof(position));
-            Text = text;
             BorderElement = new RectangleRenderElement(position, width, height, fill_color, border_color, border_width);
             TextElement = new TextRenderElement(Position, text, text_color);
             TextSize = 12;
+            Text = text;
         }
 
         public bool Resize = true;
@@ -30,6 +30,8 @@ namespace UML_Editor.Nodes
         {
             get => BorderElement.Width;
             set => BorderElement.Width = value;
+
+
         }
         public int Height
         {
@@ -74,23 +76,19 @@ namespace UML_Editor.Nodes
 
         public void Render(Renderer renderer)
         {
-            if (Resize)
-                ForceResize();
-            else
-                GetDrawnText();
 
             if (isFocused)
                 FillColor = Color.CornflowerBlue;
             else
                 FillColor = Color.White;
-
+            GetDrawnText();
             BorderElement.Render(renderer);
             TextElement.Render(renderer);
         }
 
         public void HandleKey(char key)
         {
-            if (key == (char)8)
+            if (key == (char)8 && Text.Length > 0)
                 Text = Text.Substring(0, Text.Length - 1);
             else if (Char.IsWhiteSpace(key))
                 Text = Text.Insert(Text.Length, " ");
@@ -103,20 +101,29 @@ namespace UML_Editor.Nodes
 
         }
 
-        private void ForceResize()
+        public void ForceResize(int width)
         {
-            Width = 13 + (Text.Length - 1) * 9;
-            TextElement.Text = Text;
+            Width = width;
         }
 
         private void GetDrawnText()
         {
-            int range = 0;
-            for (int i = 13; i <= Width; i += Renderer.TextWidthGap)
+            if (GetTextWidth() > Width)
             {
-                range++;
+                int range = 0;
+                for (int i = 13; i <= Width; i += Renderer.TextWidthGap)
+                {
+                    range++;
+                }
+                if (isFocused)
+                    TextElement.Text = Text.Substring(Text.Length - range, range);
+                else
+                    TextElement.Text = Text.Substring(0, range);
             }
-            TextElement.Text = Text.Substring(0, range);
+            else
+                TextElement.Text = Text;
         }
+
+        private int GetTextWidth() => 13 + (Text.Length - 1) * 9;
     }
 }

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace UML_Editor.Nodes
 {
-    public interface IKeyboardHandlerNode
+    public interface IKeyboardHandlerNode : IHandlerNode
     {
         void HandleKey(char key);
     }

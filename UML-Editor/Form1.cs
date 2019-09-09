@@ -26,10 +26,14 @@ namespace UML_Editor
             this.KeyPress += editor.OnKeyPress;
             this.KeyDown += editor.OnKeyDown;
             this.KeyUp += editor.OnKeyUp;
-            bool test = false;
-            editor.AddNode(new TextBoxNode("txt1", "OOOOOO", Vector.Zero, 22, 18, Color.Black, Color.Black, Color.White));
-            editor.AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, 50, () => { test = true; }, new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
+            editor.AddNode(new TextBoxNode("txt1", "O", Vector.Zero, 31, 18, Color.Black, Color.Black, Color.White));
+            editor.AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, 50, () => Resize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
             editor.Render();
+        }
+
+        private void Resize()
+        {
+            editor.ResizeAll(60);
         }
     }
 }

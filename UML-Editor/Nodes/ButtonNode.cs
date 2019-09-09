@@ -40,5 +40,9 @@ namespace UML_Editor.Nodes
         {
             ButtonRectangle.Render(renderer);
         }
+
+        public void ForceResize(int width)
+        {
+        }
     }
 }

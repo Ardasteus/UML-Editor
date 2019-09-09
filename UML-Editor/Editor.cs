@@ -39,10 +39,18 @@ namespace UML_Editor
             Nodes.Add(node);
         }
 
+        public void ResizeAll(int width)
+        {
+            Nodes.ForEach(x => x.ForceResize(width));
+        }
+
         public void OnKeyPress(object sender, KeyPressEventArgs e)
         {
             if(FocusedKeyboardNode != null)
-                FocusedKeyboardNode.HandleKey(e.KeyChar);
+            {
+                if(e.KeyChar != (char)13)
+                    FocusedKeyboardNode.HandleKey(e.KeyChar);
+            }
             Render();
         }
         public void OnKeyDown(object sender, KeyEventArgs e)
@@ -79,8 +87,7 @@ namespace UML_Editor
             {
                 if(FocusedKeyboardNode != null)
                 {
-                    if(FocusedKeyboardNode is IMouseHandlerNode n)
-                        n.isFocused = false;
+                    FocusedKeyboardNode.isFocused = false;
                     FocusedKeyboardNode = null;
                 }
             }

@@ -15,5 +15,6 @@ namespace UML_Editor.Nodes
         Vector Position { get; set; }
         int Width { get; set; }
         int Height { get; set; }
+        void ForceResize(int width);
     }
 }
