@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace UML_Editor.Nodes
 {
@@ -21,7 +22,7 @@ namespace UML_Editor.Nodes
             TextSize = 12;
         }
 
-        public bool Resize = false;
+        public bool Resize = true;
         public string Name { get; set; }
         public string Text { get; set; }
         public Vector Position { get; set; }
@@ -77,22 +78,33 @@ namespace UML_Editor.Nodes
                 ForceResize();
             else
                 GetDrawnText();
+
+            if (isFocused)
+                FillColor = Color.CornflowerBlue;
+            else
+                FillColor = Color.White;
+
             BorderElement.Render(renderer);
             TextElement.Render(renderer);
         }
 
-        public void HandleKey()
+        public void HandleKey(char key)
         {
-
+            if (key == (char)8)
+                Text = Text.Substring(0, Text.Length - 1);
+            else if (Char.IsLetter(key))
+                Text = Text.Insert(Text.Length, key.ToString());
         }
 
         public void HandleMouse()
         {
+
         }
 
-        public void ForceResize()
+        private void ForceResize()
         {
             Width = 13 + (Text.Length - 1) * 9;
+            TextElement.Text = Text;
         }
 
         private void GetDrawnText()

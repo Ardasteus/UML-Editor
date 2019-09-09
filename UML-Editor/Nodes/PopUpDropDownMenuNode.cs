@@ -26,7 +26,7 @@ namespace UML_Editor.Nodes
 
         }
 
-        public void HandleKey()
+        public void HandleKey(char key)
         {
             
         }

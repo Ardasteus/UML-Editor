@@ -39,7 +39,6 @@
             this.Plane.Size = new System.Drawing.Size(775, 425);
             this.Plane.TabIndex = 0;
             this.Plane.TabStop = false;
-            this.Plane.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Plane_MouseClick);
             // 
             // Form1
             // 

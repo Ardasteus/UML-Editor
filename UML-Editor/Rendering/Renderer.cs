@@ -69,10 +69,11 @@ namespace UML_Editor.Rendering
 
         public void Render()
         {
-            lock(plane)
-            {
-                plane.Refresh();
-            }
+            plane.Refresh();
+        }
+        public void Clear()
+        {
+            GetGraphics().Clear(Color.White);
         }
 
         private Graphics GetGraphics()
