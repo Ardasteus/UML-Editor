@@ -55,7 +55,8 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Nodes\ButtonNode.cs" />
-    <Compile Include="Nodes\DropDownMenu.cs" />
+    <Compile Include="Nodes\ContextMenu.cs" />
+    <Compile Include="Nodes\Interfaces\IContainerNode.cs" />
     <Compile Include="Nodes\Interfaces\IHandlerNode.cs" />
     <Compile Include="Nodes\Interfaces\IKeyboardHandlerNode.cs" />
     <Compile Include="Nodes\Interfaces\IMouseHandlerNode.cs" />
@@ -63,7 +64,6 @@
     <Compile Include="Nodes\Interfaces\IRelationshipMemberNode.cs" />
     <Compile Include="Nodes\Interfaces\IRelationshipNode.cs" />
     <Compile Include="Nodes\Interfaces\IRenderableNode.cs" />
-    <Compile Include="Nodes\PopUpDropDownMenuNode.cs" />
     <Compile Include="Nodes\TextBoxNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

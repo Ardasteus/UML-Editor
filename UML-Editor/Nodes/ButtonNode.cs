@@ -28,6 +28,7 @@ namespace UML_Editor.Nodes
         public bool isFocused { get; set; } = false;
 
         public Action ButtonAction { get; private set; }
+        public bool Resize { get; set; }
 
         private RectangleRenderElement ButtonRectangle;
 

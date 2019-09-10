@@ -12,7 +12,7 @@ namespace UML_Editor.Nodes
 {
     public class TextBoxNode : IRenderableNode, IKeyboardHandlerNode, IMouseHandlerNode
     {
-        public TextBoxNode(string name, string text, Vector position, int width, int height, Color text_color, Color border_color, Color fill_color, int border_width = 1)
+        public TextBoxNode(string name, string text, Vector position, int width, int height, bool resize, Color text_color, Color border_color, Color fill_color, int border_width = 1)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Position = position ?? throw new ArgumentNullException(nameof(position));
@@ -20,9 +20,20 @@ namespace UML_Editor.Nodes
             TextElement = new TextRenderElement(Position, text, text_color);
             TextSize = 12;
             Text = text;
+            Resize = true;
+            if (Resize)
+                ForceResize();
         }
-
-        public bool Resize = true;
+        private bool resize;
+        public bool Resize
+        {
+            get => resize;
+            set
+            {
+                resize = value;
+                ForceResize();
+            }
+        }
         public string Name { get; set; }
         public string Text { get; set; }
         public Vector Position { get; set; }
@@ -30,8 +41,6 @@ namespace UML_Editor.Nodes
         {
             get => BorderElement.Width;
             set => BorderElement.Width = value;
-
-
         }
         public int Height
         {
@@ -90,10 +99,13 @@ namespace UML_Editor.Nodes
         {
             if (key == (char)8 && Text.Length > 0)
                 Text = Text.Substring(0, Text.Length - 1);
+            else if (key == (char)13)
+                isFocused = false;
             else if (Char.IsWhiteSpace(key))
                 Text = Text.Insert(Text.Length, " ");
             else if (Char.IsLetter(key))
                 Text = Text.Insert(Text.Length, key.ToString());
+            ForceResize();
         }
 
         public void HandleMouse()
@@ -101,6 +113,11 @@ namespace UML_Editor.Nodes
 
         }
 
+        private void ForceResize()
+        {
+            if(Resize)
+                Width = Renderer.GetTextWidth(Text.Length);
+        }
         public void ForceResize(int width)
         {
             Width = width;
@@ -108,7 +125,7 @@ namespace UML_Editor.Nodes
 
         private void GetDrawnText()
         {
-            if (GetTextWidth() > Width)
+            if (Renderer.GetTextWidth(Text.Length) > Width && !Resize)
             {
                 int range = 0;
                 for (int i = 13; i <= Width; i += Renderer.TextWidthGap)
@@ -123,7 +140,5 @@ namespace UML_Editor.Nodes
             else
                 TextElement.Text = Text;
         }
-
-        private int GetTextWidth() => 13 + (Text.Length - 1) * 9;
     }
 }
