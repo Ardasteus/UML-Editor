@@ -82,9 +82,17 @@ namespace UML_Editor.Rendering
         }
 
         public static readonly int TextWidthGap = 9;
+        public static readonly int TextHeightGap = 15;
+        public static readonly int SingleTextHeight = 18;
+        public static readonly int SingleTextWidth = 13;
         public static int GetTextWidth(int text_length)
         {
             return 13 + (text_length - 1) * 9;
+        }
+        public static int GetTextHeight(int lines)
+        {
+            int r = 18 + (lines - 1) * 15;
+            return r;
         }
     }
 }

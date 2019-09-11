@@ -31,6 +31,7 @@ namespace UML_Editor.Nodes
         public bool Resize { get; set; }
 
         private RectangleRenderElement ButtonRectangle;
+        private TextRenderElement TextElement;
 
         public void HandleMouse()
         {

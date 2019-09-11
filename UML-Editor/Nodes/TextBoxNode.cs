@@ -15,12 +15,12 @@ namespace UML_Editor.Nodes
         public TextBoxNode(string name, string text, Vector position, int width, int height, bool resize, Color text_color, Color border_color, Color fill_color, int border_width = 1)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Position = position ?? throw new ArgumentNullException(nameof(position));
             BorderElement = new RectangleRenderElement(position, width, height, fill_color, border_color, border_width);
             TextElement = new TextRenderElement(Position, text, text_color);
+            Position = position ?? throw new ArgumentNullException(nameof(position));
             TextSize = 12;
             Text = text;
-            Resize = true;
+            Resize = resize;
             if (Resize)
                 ForceResize();
         }
@@ -36,7 +36,15 @@ namespace UML_Editor.Nodes
         }
         public string Name { get; set; }
         public string Text { get; set; }
-        public Vector Position { get; set; }
+        public Vector Position
+        {
+            get => BorderElement.Position;
+            set
+            {
+                BorderElement.Position = value;
+                TextElement.Position = value;
+            }
+        }
         public int Width
         {
             get => BorderElement.Width;
