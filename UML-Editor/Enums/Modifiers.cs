@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace UML_Editor.Enums
 {
-    public enum AccessModifiers
+    public enum Modifiers
     {
-        Private,
-        Public,
-        Protected
+        None,
+        Static,
+        Abstract
     }
 }
