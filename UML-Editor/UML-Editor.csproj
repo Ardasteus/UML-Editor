@@ -67,6 +67,7 @@
     <Compile Include="Nodes\Interfaces\IRelationshipNode.cs" />
     <Compile Include="Nodes\Interfaces\IRenderableNode.cs" />
     <Compile Include="Nodes\LabelNode.cs" />
+    <Compile Include="Nodes\MethodNode.cs" />
     <Compile Include="Nodes\PropertyNode.cs" />
     <Compile Include="Nodes\TextBoxNode.cs" />
     <Compile Include="Program.cs" />

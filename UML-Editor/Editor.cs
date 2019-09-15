@@ -23,7 +23,8 @@ namespace UML_Editor
             renderTarget.MouseClick += OnMouseClick;
             renderTarget.MouseMove += OnMouseMove;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddNode(new PropertyNode("prop1", Vector.Zero, "String", "PropertyName", AccessModifiers.Private, Modifiers.None));
+            AddNode(new PropertyNode("prop1", Vector.Zero, "string", "PropertyName", AccessModifiers.Private, Modifiers.None));
+            AddNode(new MethodNode("mthd1", new Vector(0, Renderer.SingleTextHeight), "string", "MethodName", AccessModifiers.Public, Modifiers.Abstract));
         }
 
         private void SwitchAllResize()
