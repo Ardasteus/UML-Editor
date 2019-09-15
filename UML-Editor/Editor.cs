@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using UML_Editor.Rendering;
 using UML_Editor.Nodes;
 using UML_Editor.Rendering.ElementStyles;
+using UML_Editor.Enums;
 
 namespace UML_Editor
 {
@@ -22,10 +23,7 @@ namespace UML_Editor
             renderTarget.MouseClick += OnMouseClick;
             renderTarget.MouseMove += OnMouseMove;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddNode(new ContextMenuNode("ctxt1", new Vector(50, 50), Renderer.GetTextWidth(10), 0, RectangleRenderElementStyle.Default));
-            Nodes.OfType<ContextMenuNode>().ToList().ForEach(x => x.AddNode(new TextBoxNode("txt", "TextBox", Vector.Zero, 20, Renderer.SingleTextHeight, false, Color.Black, Color.Black, Color.White)));
-            Nodes.OfType<ContextMenuNode>().ToList().ForEach(x => x.AddNode(new TextBoxNode("txt", "TextBox", Vector.Zero, 20, Renderer.SingleTextHeight, false, Color.Black, Color.Black, Color.White)));
-            Nodes.OfType<ContextMenuNode>().ToList().ForEach(x => x.AddNode(new TextBoxNode("txt", "TextBox", Vector.Zero, 20, Renderer.SingleTextHeight, false, Color.Black, Color.Black, Color.White)));
+            AddNode(new PropertyNode("prop1", Vector.Zero, "String", "PropertyName", AccessModifiers.Private, Modifiers.None));
         }
 
         private void SwitchAllResize()
