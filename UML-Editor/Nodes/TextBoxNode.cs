@@ -7,6 +7,7 @@ using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
 using System.Windows.Forms;
+using UML_Editor.Others;
 
 namespace UML_Editor.Nodes
 {
@@ -17,12 +18,12 @@ namespace UML_Editor.Nodes
             Name = name ?? throw new ArgumentNullException(nameof(name));
             BorderElement = new RectangleRenderElement(position, width, height, fill_color, border_color, border_width);
             TextElement = new TextRenderElement(Position, text, text_color);
-            Position = position ?? throw new ArgumentNullException(nameof(position));
             TextSize = 12;
             Text = text;
             Resize = resize;
             if (Resize)
                 ForceResize();
+            TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
         }
         private bool resize;
         public bool Resize
@@ -34,6 +35,8 @@ namespace UML_Editor.Nodes
                 ForceResize();
             }
         }
+
+        public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public string Name { get; set; }
         public string Text { get; set; }
         public Vector Position
@@ -43,17 +46,26 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Position = value;
                 TextElement.Position = value;
+                ((RectangleHitbox)TriggerAreas[0]).Position = value;
             }
         }
         public int Width
         {
             get => BorderElement.Width;
-            set => BorderElement.Width = value;
+            set
+            {
+                BorderElement.Width = value;
+                ((RectangleHitbox)TriggerAreas[0]).Width = value;
+            }
         }
         public int Height
         {
             get => BorderElement.Height;
-            set => BorderElement.Height = value;
+            set
+            {
+                BorderElement.Height = value;
+                ((RectangleHitbox)TriggerAreas[0]).Height = value;
+            }
         }
         public bool isFocused { get; set; } = false;
         public Color BorderColor

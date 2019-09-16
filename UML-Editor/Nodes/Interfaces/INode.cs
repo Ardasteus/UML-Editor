@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UML_Editor.Enums;
+using UML_Editor.Others;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 
@@ -17,5 +18,6 @@ namespace UML_Editor.Nodes
         int Height { get; set; }
         bool Resize { get; set; }
         void ForceResize(int width);
+        List<IHitbox> TriggerAreas { get; set; }
     }
 }

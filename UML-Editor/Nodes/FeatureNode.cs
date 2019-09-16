@@ -7,6 +7,8 @@ using UML_Editor.Rendering;
 using UML_Editor.Enums;
 using UML_Editor.Rendering.RenderingElements;
 using UML_Editor.Rendering.ElementStyles;
+using UML_Editor.Others;
+using System.Drawing;
 
 namespace UML_Editor.Nodes
 {
@@ -18,21 +20,22 @@ namespace UML_Editor.Nodes
         public TextBoxNode TypeTextBox { get; set; }
         public TextBoxNode NameTextBox { get; set; }
         public RectangleRenderElement BorderElement { get; set; }
-        public FeatureNode(string name, Vector position, AccessModifiers accessModifier, Modifiers modifier)
+        public FeatureNode(string name, AccessModifiers accessModifier, Modifiers modifier)
         {
             Name = name;
-            Position = position;
             AccessModifier = accessModifier;
             Modifier = modifier;
         }
 
         public string Name { get; set; }
-        public Vector Position { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public abstract Vector Position { get; set; }
+        public abstract int Width { get; set; }
+        public abstract int Height { get; set; }
+        public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public bool Resize { get; set; }
         public AccessModifiers AccessModifier { get; set; }
         public Modifiers Modifier { get; set; }
+        public bool IsMenuShown { get; set; } = false;
 
         public abstract void ForceResize(int width);
 
@@ -57,15 +60,16 @@ namespace UML_Editor.Nodes
         public void GeneratePrefab()
         {
             int biggest = Renderer.GetTextWidth("Protected".Length);
-            MenuPrefab = new ContextMenuNode("cnt", new Vector(AccessModifierButton.Position.X + Renderer.SingleTextWidth, 0), biggest, 0, RectangleRenderElementStyle.Default);
+            MenuPrefab = new ContextMenuNode("cnt", Position + new Vector(AccessModifierButton.Position.X + Renderer.SingleTextWidth, 0), biggest, 0, RectangleRenderElementStyle.Default);
             MenuPrefab.AddNode(new ButtonNode("btn1", "Public", Vector.Zero, MenuPrefab.Width, Renderer.SingleTextHeight, () =>
             {
                 AccessModifier = AccessModifiers.Public;
                 AccessModifierButton.Text = GetModifierChar();
                 Height = Renderer.SingleTextHeight;
                 AccessModifiersContextMenu = null;
+                TriggerAreas.RemoveAt(1);
+                IsMenuShown = false;
                 GeneratePrefab();
-
             },
             RectangleRenderElementStyle.Default));
             MenuPrefab.AddNode(new ButtonNode("btn1", "Private", Vector.Zero, MenuPrefab.Width, Renderer.SingleTextHeight, () =>
@@ -74,6 +78,8 @@ namespace UML_Editor.Nodes
                 AccessModifierButton.Text = GetModifierChar();
                 Height = Renderer.SingleTextHeight;
                 AccessModifiersContextMenu = null;
+                TriggerAreas.RemoveAt(1);
+                IsMenuShown = false;
                 GeneratePrefab();
 
             },
@@ -84,6 +90,8 @@ namespace UML_Editor.Nodes
                 AccessModifierButton.Text = GetModifierChar();
                 Height = Renderer.SingleTextHeight;
                 AccessModifiersContextMenu = null;
+                TriggerAreas.RemoveAt(1);
+                IsMenuShown = false;
                 GeneratePrefab();
             },
             RectangleRenderElementStyle.Default));
@@ -95,11 +103,16 @@ namespace UML_Editor.Nodes
         {
             if (AccessModifiersContextMenu == null)
             {
-                Height = 3 * Renderer.SingleTextHeight;
+                TriggerAreas.Add(new RectangleHitbox(MenuPrefab.Position, MenuPrefab.Width, MenuPrefab.Height));
                 AccessModifiersContextMenu = MenuPrefab;
+                IsMenuShown = true;
             }
             else
+            {
+                TriggerAreas.RemoveAt(1);
                 AccessModifiersContextMenu = null;
+                IsMenuShown = false;
+            }
         }
     }
 }

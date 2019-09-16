@@ -9,6 +9,7 @@ using UML_Editor.Rendering;
 using UML_Editor.Nodes;
 using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Enums;
+using UML_Editor.Others;
 
 namespace UML_Editor
 {
@@ -24,7 +25,7 @@ namespace UML_Editor
             renderTarget.MouseMove += OnMouseMove;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
             AddNode(new PropertyNode("prop1", Vector.Zero, "string", "PropertyName", AccessModifiers.Private, Modifiers.None));
-            AddNode(new MethodNode("mthd1", new Vector(0, Renderer.SingleTextHeight), "string", "MethodName", AccessModifiers.Public, Modifiers.Abstract));
+            AddNode(new MethodNode("mthd1", new Vector(0,  5 * Renderer.SingleTextHeight), "string", "MethodName", AccessModifiers.Public, Modifiers.Abstract));
         }
 
         private void SwitchAllResize()
@@ -176,11 +177,12 @@ namespace UML_Editor
 
         private bool CheckIfClicked(Vector position, INode node)
         {
-            int left = node.Position.X;
-            int right = node.Position.X + node.Width;
-            int top = node.Position.Y;
-            int bot = node.Position.Y + node.Height;
-            return position.X <= right && position.X >= left && position.Y <= bot && position.Y >= top;
+            foreach  (IHitbox hitbox in node.TriggerAreas)
+            {
+                if (hitbox.HasTriggered(position))
+                    return true;
+            }
+            return false;
         }
     }
 }

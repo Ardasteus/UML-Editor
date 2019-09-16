@@ -7,6 +7,7 @@ using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using UML_Editor.Rendering.ElementStyles;
 using System.Drawing;
+using UML_Editor.Others;
 
 namespace UML_Editor.Nodes
 {
@@ -15,14 +16,14 @@ namespace UML_Editor.Nodes
         public ButtonNode(string name, string text, Vector position, int width, int height, Action buttonAction, RectangleRenderElementStyle style)
         { 
             Name = name;
-            Width = width;
-            Height = height;
             BorderElement = new RectangleRenderElement(position, width, height, style.FillColor, style.BorderColor, style.BorderWidth);
             TextElement = new TextRenderElement(new Vector(position.X, position.Y), text, Color.Black, 12);
+            TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
             ButtonAction = buttonAction;
         }
 
         public string Name { get; set; }
+        public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public Vector Position
         {
             get => BorderElement.Position;
@@ -30,10 +31,27 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Position = value;
                 TextElement.Position = value;
+                ((RectangleHitbox)TriggerAreas[0]).Position = value;
             }
         }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public int Width
+        {
+            get => BorderElement.Width;
+            set
+            {
+                BorderElement.Width = value;
+                ((RectangleHitbox)TriggerAreas[0]).Width = value;
+            }
+        }
+        public int Height
+        {
+            get => BorderElement.Height;
+            set
+            {
+                BorderElement.Height = value;
+                ((RectangleHitbox)TriggerAreas[0]).Height = value;
+            }
+        }
         public bool isFocused { get; set; } = false;
         public string Text
         {
