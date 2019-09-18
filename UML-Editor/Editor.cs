@@ -24,21 +24,9 @@ namespace UML_Editor
             renderTarget.MouseClick += OnMouseClick;
             renderTarget.MouseMove += OnMouseMove;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddNode(new PropertyNode("prop1", Vector.Zero, "string", "PropertyName", AccessModifiers.Private, Modifiers.None));
-            AddNode(new MethodNode("mthd1", new Vector(0,  5 * Renderer.SingleTextHeight), "string", "MethodName", AccessModifiers.Public, Modifiers.Abstract));
+            AddNode(new ClassDiagramNode(Vector.Zero, "Class", Modifiers.None, AccessModifiers.Public));
+            ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
         }
-
-        private void SwitchAllResize()
-        {
-            if(Nodes[0] != null)
-            {
-                if (Nodes[0].Resize)
-                    Nodes.ForEach(x => x.Resize = false);
-                else
-                    Nodes.ForEach(x => x.Resize = true);
-            }
-        }
-
         public void Render()
         {
             Clear();
@@ -54,11 +42,6 @@ namespace UML_Editor
         public void AddNode(INode node)
         {
             Nodes.Add(node);
-        }
-
-        public void ResizeAll(int width)
-        {
-            Nodes.ForEach(x => x.ForceResize(width));
         }
 
         public void OnKeyPress(object sender, KeyPressEventArgs e)

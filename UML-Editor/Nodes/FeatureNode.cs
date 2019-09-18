@@ -32,7 +32,7 @@ namespace UML_Editor.Nodes
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
-        public bool Resize { get; set; }
+
         public AccessModifiers AccessModifier { get; set; }
         public Modifiers Modifier { get; set; }
         public bool IsMenuShown { get; set; } = false;
@@ -114,5 +114,8 @@ namespace UML_Editor.Nodes
                 IsMenuShown = false;
             }
         }
+        public Action OnResize { get; set; }
+        public Action OnFocused { get; set; }
+        public Action OnUnfocused { get; set; }
     }
 }

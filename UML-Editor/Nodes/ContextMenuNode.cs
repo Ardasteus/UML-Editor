@@ -29,6 +29,7 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Width = value;
                 ((RectangleHitbox)TriggerAreas[0]).Width = value;
+                OnResize?.Invoke();
             }
         }
         public int Height
@@ -42,7 +43,7 @@ namespace UML_Editor.Nodes
         }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public bool isFocused { get; set; }
-        public bool Resize { get; set; }
+
 
         private List<INode> ChildNodes = new List<INode>();
         private RectangleRenderElement BorderElement;
@@ -57,7 +58,6 @@ namespace UML_Editor.Nodes
         public void AddNode(INode node)
         {
             node.Position = new Vector(Position.X, Position.Y + ChildNodes.Count * Renderer.SingleTextHeight);
-            node.ForceResize(Width);
             Height += Renderer.SingleTextHeight;
             ChildNodes.Add(node);
         }
@@ -73,15 +73,12 @@ namespace UML_Editor.Nodes
             ChildNodes.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(renderer));
         }
 
-        public void ForceResize(int width)
-        {
-            BorderElement.Width = width;
-            ChildNodes.ForEach(x => x.ForceResize(width));
-        }
-
         public List<INode> GetChildren()
         {
             return ChildNodes;
         }
+        public Action OnResize { get; set; }
+        public Action OnFocused { get; set; }
+        public Action OnUnfocused { get; set; }
     }
 }

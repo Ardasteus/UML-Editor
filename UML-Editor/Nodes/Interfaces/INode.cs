@@ -16,8 +16,9 @@ namespace UML_Editor.Nodes
         Vector Position { get; set; }
         int Width { get; set; }
         int Height { get; set; }
-        bool Resize { get; set; }
-        void ForceResize(int width);
         List<IHitbox> TriggerAreas { get; set; }
+        Action OnResize { get; set; }
+        Action OnFocused { get; set; }
+        Action OnUnfocused { get; set; }
     }
 }

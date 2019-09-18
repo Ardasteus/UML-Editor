@@ -13,32 +13,28 @@ namespace UML_Editor.Nodes
 {
     public class TextBoxNode : IRenderableNode, IKeyboardHandlerNode, IMouseHandlerNode
     {
-        public TextBoxNode(string name, string text, Vector position, int width, int height, bool resize, Color text_color, Color border_color, Color fill_color, int border_width = 1)
+        public TextBoxNode(string name, string text, Vector position, int width, int height, Color text_color, Color border_color, Color fill_color, int border_width = 1)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             BorderElement = new RectangleRenderElement(position, width, height, fill_color, border_color, border_width);
             TextElement = new TextRenderElement(Position, text, text_color);
             TextSize = 12;
+            TriggerAreas.Add(new RectangleHitbox(position, width, height));
             Text = text;
-            Resize = resize;
-            if (Resize)
-                ForceResize();
-            TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
         }
-        private bool resize;
-        public bool Resize
-        {
-            get => resize;
-            set
-            {
-                resize = value;
-                ForceResize();
-            }
-        }
+
 
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public string Name { get; set; }
-        public string Text { get; set; }
+        public string Text
+        {
+            get => TextElement.Text;
+            set
+            {
+                TextElement.Text = value;
+                Width = Renderer.GetTextWidth(Text.Length);
+            }
+        }
         public Vector Position
         {
             get => BorderElement.Position;
@@ -55,7 +51,8 @@ namespace UML_Editor.Nodes
             set
             {
                 BorderElement.Width = value;
-                ((RectangleHitbox)TriggerAreas[0]).Width = value;
+                ((RectangleHitbox)TriggerAreas[0]).Width = value;   
+                OnResize?.Invoke();
             }
         }
         public int Height
@@ -118,14 +115,16 @@ namespace UML_Editor.Nodes
         public void HandleKey(char key)
         {
             if (key == (char)8 && Text.Length > 0)
+            {
                 Text = Text.Substring(0, Text.Length - 1);
+                Width = Renderer.GetTextWidth(Text.Length);
+            }
             else if (key == (char)13)
                 isFocused = false;
             else if (Char.IsWhiteSpace(key))
                 Text = Text.Insert(Text.Length, " ");
             else if (Char.IsLetter(key))
                 Text = Text.Insert(Text.Length, key.ToString());
-            ForceResize();
         }
 
         public void HandleMouse()
@@ -133,19 +132,9 @@ namespace UML_Editor.Nodes
 
         }
 
-        private void ForceResize()
-        {
-            if(Resize)
-                Width = Renderer.GetTextWidth(Text.Length);
-        }
-        public void ForceResize(int width)
-        {
-            Width = width;
-        }
-
         private void GetDrawnText()
         {
-            if (Renderer.GetTextWidth(Text.Length) > Width && !Resize)
+            if (Renderer.GetTextWidth(Text.Length) > Width)
             {
                 int range = 0;
                 for (int i = 13; i <= Width; i += Renderer.TextWidthGap)
@@ -160,5 +149,8 @@ namespace UML_Editor.Nodes
             else
                 TextElement.Text = Text;
         }
+        public Action OnResize { get; set; }
+        public Action OnFocused { get; set; }
+        public Action OnUnfocused { get; set; }
     }
 }

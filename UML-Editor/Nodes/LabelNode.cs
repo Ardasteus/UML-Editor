@@ -28,6 +28,7 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Width = value;
                 ((RectangleHitbox)TriggerAreas[0]).Width = value;
+                OnResize?.Invoke();
             }
         }
         public int Height
@@ -42,7 +43,7 @@ namespace UML_Editor.Nodes
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         private RectangleRenderElement BorderElement;
         private TextRenderElement TextElement;
-        public bool Resize { get; set; }
+
 
         public void ForceResize(int width)
         {
@@ -51,5 +52,8 @@ namespace UML_Editor.Nodes
         public void Render(Renderer renderer)
         {
         }
+        public Action OnResize { get; set; }
+        public Action OnFocused { get; set; }
+        public Action OnUnfocused { get; set; }
     }
 }
