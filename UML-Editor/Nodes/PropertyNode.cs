@@ -53,7 +53,7 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Width = value;
                 ((RectangleHitbox)TriggerAreas[0]).Width = value;
-                OnResize?.Invoke();
+                OnResize?.Invoke(this, new ResizeEventArgs(Width));
             }
         }
         public override int Height
@@ -71,17 +71,11 @@ namespace UML_Editor.Nodes
             return AccessModifierButton.Width + NameTextBox.Width + TypeTextBox.Width;
         }
 
-        private void Resize()
+        private void Resize(object sender, ResizeEventArgs args)
         {
             Width = GetWidth();
-            NameTextBox.Position = Position + AccessModifierButton.Position;
-            NameTextBox.Position.Y = Position.Y;
-            TypeTextBox.Position = Position + AccessModifierButton.Position + NameTextBox.Position;
-            TypeTextBox.Position.Y = Position.Y;
-        }
-
-        public override void ForceResize(int width)
-        {
+            NameTextBox.Position = new Vector(Position.X + AccessModifierButton.Width, Position.Y);
+            TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
         }
 
         public override List<INode> GetChildren()

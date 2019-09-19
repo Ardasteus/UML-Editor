@@ -10,6 +10,7 @@ using UML_Editor.Nodes;
 using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Enums;
 using UML_Editor.Others;
+using UML_Editor.Nodes.Interfaces;
 
 namespace UML_Editor
 {
@@ -18,6 +19,8 @@ namespace UML_Editor
         private Renderer Renderer;
         private List<INode> Nodes = new List<INode>();
         private IKeyboardHandlerNode FocusedKeyboardNode;
+        private ContextMenuNode OptionsPrefab;
+        private ContextMenuNode OptionsMenu;
         public Editor(PictureBox renderTarget)
         {
             Renderer = new Renderer(renderTarget);
@@ -26,11 +29,15 @@ namespace UML_Editor
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
             AddNode(new ClassDiagramNode(Vector.Zero, "Class", Modifiers.None, AccessModifiers.Public));
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
         }
         public void Render()
         {
             Clear();
             Nodes.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(Renderer));
+            OptionsMenu?.Render(Renderer);
             Renderer.Render();
         }
 
@@ -78,15 +85,33 @@ namespace UML_Editor
         public void OnMouseClick(object sender, MouseEventArgs e)
         {
             Vector mouse_position = e.Location - Renderer.Origin;
-            INode temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
-            if(node != null)
+            if(e.Button == MouseButtons.Left)
             {
-                if(FocusedKeyboardNode != null)
+                HandleLeftClick(mouse_position);
+            }
+            else if(e.Button == MouseButtons.Right)
+            {
+                HandleRightClick(mouse_position);
+            }
+
+            Render();
+        }
+
+        private void HandleLeftClick(Vector mouse_position)
+        {
+            INode temp = null;
+            if (OptionsMenu != null && CheckIfClicked(mouse_position, OptionsMenu))
+                temp = OptionsMenu;
+            else
+                temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
+            if (node != null)
+            {
+                if (FocusedKeyboardNode != null)
                 {
-                    if(node is IKeyboardHandlerNode kn)
+                    if (node is IKeyboardHandlerNode kn)
                     {
-                        if(FocusedKeyboardNode != kn)
+                        if (FocusedKeyboardNode != kn)
                         {
                             FocusedKeyboardNode.isFocused = false;
                             FocusedKeyboardNode = kn;
@@ -100,7 +125,7 @@ namespace UML_Editor
                 }
                 else
                 {
-                    if(node is IKeyboardHandlerNode n)
+                    if (node is IKeyboardHandlerNode n)
                     {
                         FocusedKeyboardNode = n;
                     }
@@ -111,14 +136,33 @@ namespace UML_Editor
             }
             else
             {
-                if(FocusedKeyboardNode != null)
+                if (FocusedKeyboardNode != null)
                 {
                     FocusedKeyboardNode.isFocused = false;
                     FocusedKeyboardNode = null;
                 }
             }
-
-            Render();
+        }
+        private void HandleRightClick(Vector mouse_position)
+        {
+            INode temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            if(temp == null)
+            {
+                if (OptionsMenu == null)
+                {
+                    GeneratePrefab(mouse_position);
+                    OptionsMenu = OptionsPrefab;
+                }
+                else
+                {
+                    OptionsMenu = null;
+                }
+            }
+            else if(temp is IOptionsNode op)
+            {
+                op.OptionsPrefab.Position = mouse_position;
+                op.ShowMenu();
+            }
         }
 
         private IMouseHandlerNode SearchForClicked(INode parent_node, Vector mouse_position)
@@ -166,6 +210,16 @@ namespace UML_Editor
                     return true;
             }
             return false;
+        }
+        private void GeneratePrefab(Vector mouse_positon)
+        {
+            OptionsPrefab = new ContextMenuNode("cnt", mouse_positon, 0, 0, RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Add a Diagram", mouse_positon, Renderer.GetTextWidth(13), Renderer.SingleTextHeight, () =>
+            {
+                Nodes.Add(new ClassDiagramNode(mouse_positon, "New Class", Modifiers.None, AccessModifiers.Protected));
+                OptionsMenu = null;
+            },
+            RectangleRenderElementStyle.Default));
         }
     }
 }

@@ -51,8 +51,8 @@ namespace UML_Editor.Nodes
             set
             {
                 BorderElement.Width = value;
-                ((RectangleHitbox)TriggerAreas[0]).Width = value;   
-                OnResize?.Invoke();
+                ((RectangleHitbox)TriggerAreas[0]).Width = value;
+                OnResize?.Invoke(this, new ResizeEventArgs(Width));
             }
         }
         public int Height
@@ -123,7 +123,7 @@ namespace UML_Editor.Nodes
                 isFocused = false;
             else if (Char.IsWhiteSpace(key))
                 Text = Text.Insert(Text.Length, " ");
-            else if (Char.IsLetter(key))
+            else
                 Text = Text.Insert(Text.Length, key.ToString());
         }
 
@@ -149,8 +149,8 @@ namespace UML_Editor.Nodes
             else
                 TextElement.Text = Text;
         }
-        public Action OnResize { get; set; }
-        public Action OnFocused { get; set; }
-        public Action OnUnfocused { get; set; }
+        public EventHandler<ResizeEventArgs> OnResize { get; set; }
+        public EventHandler OnFocused { get; set; }
+        public EventHandler OnUnfocused { get; set; }
     }
 }

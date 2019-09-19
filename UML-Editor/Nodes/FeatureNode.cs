@@ -37,8 +37,6 @@ namespace UML_Editor.Nodes
         public Modifiers Modifier { get; set; }
         public bool IsMenuShown { get; set; } = false;
 
-        public abstract void ForceResize(int width);
-
         public string GetModifierChar()
         {
             switch (AccessModifier)
@@ -114,8 +112,8 @@ namespace UML_Editor.Nodes
                 IsMenuShown = false;
             }
         }
-        public Action OnResize { get; set; }
-        public Action OnFocused { get; set; }
-        public Action OnUnfocused { get; set; }
+        public EventHandler<ResizeEventArgs> OnResize { get; set; }
+        public EventHandler OnFocused { get; set; }
+        public EventHandler OnUnfocused { get; set; }
     }
 }

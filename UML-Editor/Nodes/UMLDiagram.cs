@@ -21,14 +21,11 @@ namespace UML_Editor.Nodes
         public TextBoxNode NameTextBox { get; set; }
         public RectangleRenderElement BorderElement { get; set; }
 
-        public void ForceResize(int width)
-        {
-        }
         public abstract List<INode> GetChildren();
 
         public abstract void Render(Renderer renderer);
-        public Action OnResize { get; set; }
-        public Action OnFocused { get; set; }
-        public Action OnUnfocused { get; set; }
+        public EventHandler<ResizeEventArgs> OnResize { get; set; }
+        public EventHandler OnFocused { get; set; }
+        public EventHandler OnUnfocused { get; set; }
     }
 }

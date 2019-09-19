@@ -17,8 +17,8 @@ namespace UML_Editor.Nodes
         int Width { get; set; }
         int Height { get; set; }
         List<IHitbox> TriggerAreas { get; set; }
-        Action OnResize { get; set; }
-        Action OnFocused { get; set; }
-        Action OnUnfocused { get; set; }
+        EventHandler<ResizeEventArgs> OnResize { get; set; }
+        EventHandler OnFocused { get; set; }
+        EventHandler OnUnfocused { get; set; }
     }
 }

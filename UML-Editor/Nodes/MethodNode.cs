@@ -23,6 +23,9 @@ namespace UML_Editor.Nodes
             TypeTextBox = new TextBoxNode("type_txt", type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width + ArgumentsTextBox.Width, 0), Renderer.GetTextWidth(type.Length), Renderer.SingleTextHeight, Color.Black, Color.Black, Color.White);
             BorderElement = new RectangleRenderElement(position, GetWidth(), Renderer.SingleTextHeight, Color.White, Color.Black);
             TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
+            NameTextBox.OnResize = Resize;
+            TypeTextBox.OnResize = Resize;
+            ArgumentsTextBox.OnResize = Resize;
             GeneratePrefab();
         }
         public override Vector Position
@@ -41,7 +44,7 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Width = value;
                 ((RectangleHitbox)TriggerAreas[0]).Width = value;
-                OnResize?.Invoke();
+                OnResize?.Invoke(this, new ResizeEventArgs(Width));
             }
         }
         public override int Height
@@ -53,9 +56,12 @@ namespace UML_Editor.Nodes
                 ((RectangleHitbox)TriggerAreas[0]).Height = value;
             }
         }
-
-        public override void ForceResize(int width)
+        private void Resize(object sender, ResizeEventArgs args)
         {
+            Width = GetWidth();
+            NameTextBox.Position = new Vector(Position.X + AccessModifierButton.Width, Position.Y);
+            ArgumentsTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
+            TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width + ArgumentsTextBox.Width, Position.Y);
         }
 
         public override List<INode> GetChildren()
