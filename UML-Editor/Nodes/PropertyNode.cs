@@ -32,6 +32,8 @@ namespace UML_Editor.Nodes
             TypeTextBox = new TextBoxNode("type_txt", type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width, 0), Renderer.GetTextWidth(type.Length), Renderer.SingleTextHeight, Color.Black, Color.Black, Color.White);
             BorderElement = new RectangleRenderElement(position, GetWidth(), Renderer.SingleTextHeight, Color.White, Color.Black);
             TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
+            NameTextBox.OnResize = Resize;
+            TypeTextBox.OnResize = Resize;
             GeneratePrefab();
         }
 
@@ -67,6 +69,15 @@ namespace UML_Editor.Nodes
         public override int GetWidth()
         {
             return AccessModifierButton.Width + NameTextBox.Width + TypeTextBox.Width;
+        }
+
+        private void Resize()
+        {
+            Width = GetWidth();
+            NameTextBox.Position = Position + AccessModifierButton.Position;
+            NameTextBox.Position.Y = Position.Y;
+            TypeTextBox.Position = Position + AccessModifierButton.Position + NameTextBox.Position;
+            TypeTextBox.Position.Y = Position.Y;
         }
 
         public override void ForceResize(int width)
