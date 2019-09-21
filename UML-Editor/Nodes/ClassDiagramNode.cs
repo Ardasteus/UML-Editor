@@ -26,6 +26,7 @@ namespace UML_Editor.Nodes
                 BorderElement.Position = value;
                 ((RectangleHitbox)TriggerAreas[0]).Position = value;
                 Resize(this, new ResizeEventArgs(Width));
+                OnPositionChanged?.Invoke(this, new PositionEventArgs(Position));
             }
         }
         public override int Width
@@ -54,6 +55,7 @@ namespace UML_Editor.Nodes
         public ContextMenuNode OptionsPrefab { get; set; }
         public ContextMenuNode OptionsMenu { get; set; }
         public bool isFocused { get; set; }
+        public EventHandler<PositionEventArgs> OnPositionChanged { get; set; }
 
         public ClassDiagramNode(Vector position, string Name, Modifiers modifier, AccessModifiers accessModifiers)
         {
@@ -112,7 +114,7 @@ namespace UML_Editor.Nodes
             }
             NameLine.StartPoint = new Vector(Position.X, Position.Y + Renderer.SingleTextHeight);
             NameLine.EndPoint = new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight);
-            if(Properties.Last() != null)
+            if(Properties.Count > 0)
             {
                 PropertyNode prop = Properties.Last();  
                 SeparatorLine.StartPoint = prop.Position + new Vector(0, Renderer.SingleTextHeight);

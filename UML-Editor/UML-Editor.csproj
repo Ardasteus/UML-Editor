@@ -74,10 +74,14 @@
     <Compile Include="Nodes\TextBoxNode.cs" />
     <Compile Include="Nodes\UMLDiagram.cs" />
     <Compile Include="Others\IHitbox.cs" />
+    <Compile Include="Others\PositionEventArgs.cs" />
     <Compile Include="Others\RectangleHitbox.cs" />
     <Compile Include="Others\ResizeEventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Relationships\Relationship.cs" />
+    <Compile Include="Relationships\RelationshipManager.cs" />
+    <Compile Include="Relationships\RelationshipSegment.cs" />
     <Compile Include="Rendering\ElementStyles\LineRenderingElementStyle.cs" />
     <Compile Include="Rendering\ElementStyles\RectangleRenderElementStyle.cs" />
     <Compile Include="Rendering\ElementStyles\TextRenderElementStyle.cs" />

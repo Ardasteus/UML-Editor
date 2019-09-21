@@ -11,6 +11,7 @@ using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Enums;
 using UML_Editor.Others;
 using UML_Editor.Nodes.Interfaces;
+using UML_Editor.Relationships;
 
 namespace UML_Editor
 {
@@ -21,11 +22,19 @@ namespace UML_Editor
         private IKeyboardHandlerNode FocusedKeyboardNode;
         private ContextMenuNode OptionsPrefab;
         private ContextMenuNode OptionsMenu;
+        private bool IsCreatingRelationship = false;
+        private ClassDiagramNode RelationshipOrigin { get; set; }
+        private RelationshipManager RelationshipManager = new RelationshipManager();
+        private bool Intercept = false;
+        private ClassDiagramNode Dragged;
+        private Vector DraggingVector;
         public Editor(PictureBox renderTarget)
         {
             Renderer = new Renderer(renderTarget);
             renderTarget.MouseClick += OnMouseClick;
             renderTarget.MouseMove += OnMouseMove;
+            renderTarget.MouseDown += OnMouseDown;
+            renderTarget.MouseUp += OnMouseUp;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
             AddNode(new ClassDiagramNode(Vector.Zero, "Class", Modifiers.None, AccessModifiers.Public));
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
@@ -38,6 +47,7 @@ namespace UML_Editor
             Clear();
             Nodes.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(Renderer));
             OptionsMenu?.Render(Renderer);
+            RelationshipManager.Render(Renderer);
             Renderer.Render();
         }
 
@@ -69,18 +79,39 @@ namespace UML_Editor
         public void OnKeyDown(object sender, KeyEventArgs e)
         {
             Render();
-
         }
         public void OnKeyUp(object sender, KeyEventArgs e)
         {
             Render();
-
         }
 
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
+            Vector mouse_position = e.Location - Renderer.Origin;
+            if (e.Button == MouseButtons.Left && Dragged != null)
+            {
+                Dragged.Position = mouse_position + DraggingVector;
+            }
             Render();
-
+        }
+        public void OnMouseDown(object sender, MouseEventArgs e)
+        {
+            Vector mouse_position = e.Location - Renderer.Origin;
+            if (e.Button == MouseButtons.Left)
+            {
+                Dragged = ((ClassDiagramNode)Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x)));
+                if(Dragged != null)
+                    DraggingVector = Dragged.Position - mouse_position;
+            }
+        }
+        public void OnMouseUp(object sender, MouseEventArgs e)
+        {
+            if(Dragged != null)
+            {
+                Dragged = null;
+                DraggingVector = null;
+                Intercept = true;
+            }
         }
         public void OnMouseClick(object sender, MouseEventArgs e)
         {
@@ -104,42 +135,56 @@ namespace UML_Editor
                 temp = OptionsMenu;
             else
                 temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
-            if (node != null)
+            if (IsCreatingRelationship && temp != null)
             {
-                if (FocusedKeyboardNode != null)
+                if (RelationshipOrigin == null)
+                    RelationshipOrigin = (ClassDiagramNode)temp;
+                else
                 {
-                    if (node is IKeyboardHandlerNode kn)
+                    RelationshipManager.CreateRelationship(RelationshipOrigin, (ClassDiagramNode)temp);
+                    RelationshipOrigin = null;
+                    IsCreatingRelationship = false;
+                }
+            }
+            else
+            {
+                IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
+                if (node != null)
+                {
+                    if (FocusedKeyboardNode != null)
                     {
-                        if (FocusedKeyboardNode != kn)
+                        if (node is IKeyboardHandlerNode kn)
+                        {
+                            if (FocusedKeyboardNode != kn)
+                            {
+                                FocusedKeyboardNode.isFocused = false;
+                                FocusedKeyboardNode = kn;
+                            }
+                        }
+                        else
                         {
                             FocusedKeyboardNode.isFocused = false;
-                            FocusedKeyboardNode = kn;
+                            FocusedKeyboardNode = null;
                         }
                     }
                     else
                     {
-                        FocusedKeyboardNode.isFocused = false;
-                        FocusedKeyboardNode = null;
+                        if (node is IKeyboardHandlerNode n)
+                        {
+                            FocusedKeyboardNode = n;
+                        }
                     }
+
+                    node.isFocused = true;
+                    node.HandleMouse();
                 }
                 else
                 {
-                    if (node is IKeyboardHandlerNode n)
+                    if (FocusedKeyboardNode != null)
                     {
-                        FocusedKeyboardNode = n;
+                        FocusedKeyboardNode.isFocused = false;
+                        FocusedKeyboardNode = null;
                     }
-                }
-
-                node.isFocused = true;
-                node.HandleMouse();
-            }
-            else
-            {
-                if (FocusedKeyboardNode != null)
-                {
-                    FocusedKeyboardNode.isFocused = false;
-                    FocusedKeyboardNode = null;
                 }
             }
         }
@@ -217,6 +262,12 @@ namespace UML_Editor
             OptionsPrefab.AddNode(new ButtonNode("btn1", "Add a Diagram", mouse_positon, Renderer.GetTextWidth(13), Renderer.SingleTextHeight, () =>
             {
                 Nodes.Add(new ClassDiagramNode(mouse_positon, "New Class", Modifiers.None, AccessModifiers.Protected));
+                OptionsMenu = null;
+            },
+            RectangleRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Create a Relationship", mouse_positon, Renderer.GetTextWidth(21), Renderer.SingleTextHeight, () =>
+            {
+                IsCreatingRelationship = true;
                 OptionsMenu = null;
             },
             RectangleRenderElementStyle.Default));
