@@ -68,5 +68,9 @@ namespace UML_Editor.Rendering.RenderingElements
         {
             renderer.DrawRectangle(Position, Width, Height, DrawPen, FillBrush);
         }
+        public void BorderOnly(Renderer renderer)
+        {
+            renderer.DrawRectangle(Position, Width, Height, DrawPen);
+        }
     }
 }

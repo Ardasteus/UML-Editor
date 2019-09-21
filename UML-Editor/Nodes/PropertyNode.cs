@@ -27,9 +27,9 @@ namespace UML_Editor.Nodes
 
         public PropertyNode(string name, Vector position, string type, string prop_name, AccessModifiers access_modifier, Modifiers modifier) : base(name, access_modifier, modifier)
         {
-            AccessModifierButton = new ButtonNode("accs_btn", GetModifierChar(), position, Renderer.SingleTextWidth, Renderer.SingleTextHeight, ShowMenu, RectangleRenderElementStyle.Default);
-            NameTextBox = new TextBoxNode("type_txt", prop_name, position + new Vector(Renderer.SingleTextWidth, 0), Renderer.GetTextWidth(prop_name.Length), Renderer.SingleTextHeight, Color.Black, Color.Black, Color.White);
-            TypeTextBox = new TextBoxNode("type_txt", type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width, 0), Renderer.GetTextWidth(type.Length), Renderer.SingleTextHeight, Color.Black, Color.Black, Color.White);
+            AccessModifierButton = new ButtonNode("accs_btn", GetModifierChar(), position, Renderer.SingleTextWidth, Renderer.SingleTextHeight, ShowMenu, new RectangleRenderElementStyle(Color.White, Color.White, 1));
+            NameTextBox = new TextBoxNode("type_txt", prop_name, position + new Vector(Renderer.SingleTextWidth, 0), Renderer.GetTextWidth(prop_name.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
+            TypeTextBox = new TextBoxNode("type_txt", type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width, 0), Renderer.GetTextWidth(type.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
             BorderElement = new RectangleRenderElement(position, GetWidth(), Renderer.SingleTextHeight, Color.White, Color.Black);
             TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
             NameTextBox.OnResize = Resize;

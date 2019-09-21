@@ -16,6 +16,8 @@ namespace UML_Editor.Nodes
     public class ClassDiagramNode : UMLDiagram, IOptionsNode
     {
         private FeatureNode FocusedFeature;
+        private LineRenderElement NameLine;
+        private LineRenderElement SeparatorLine;
         public override Vector Position
         {
             get => BorderElement.Position;
@@ -57,8 +59,10 @@ namespace UML_Editor.Nodes
         {
             BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(Name.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
             TriggerAreas.Add(new RectangleHitbox(position, Renderer.GetTextWidth(Name.Length), Renderer.SingleTextHeight));
-            NameTextBox = new TextBoxNode("diagram_name", Name, Position, Width, Renderer.SingleTextHeight, Color.Black, Color.Black, Color.White);
+            NameTextBox = new TextBoxNode("diagram_name", Name, Position, Width, Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
             NameTextBox.OnResize = NameResize;
+            NameLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
+            SeparatorLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             GeneratePrefab();
         }
 
@@ -106,6 +110,14 @@ namespace UML_Editor.Nodes
             {
                 Methods[i].Position = Position + new Vector(0, (i + Properties.Count + 1) * Renderer.SingleTextHeight);
             }
+            NameLine.StartPoint = new Vector(Position.X, Position.Y + Renderer.SingleTextHeight);
+            NameLine.EndPoint = new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight);
+            if(Properties.Last() != null)
+            {
+                PropertyNode prop = Properties.Last();  
+                SeparatorLine.StartPoint = prop.Position + new Vector(0, Renderer.SingleTextHeight);
+                SeparatorLine.EndPoint = prop.Position + new Vector(Width, Renderer.SingleTextHeight);
+            }
         }
 
         private void NameResize(object sender, ResizeEventArgs args)
@@ -128,13 +140,13 @@ namespace UML_Editor.Nodes
         public override List<INode> GetChildren()
         {
             List<INode> ret = new List<INode>();
-            ret.Add(NameTextBox);
-            if (FocusedFeature != null)
-                ret.Add(FocusedFeature);
-            ret.AddRange(Properties.Where(x => x != FocusedFeature));
-            ret.AddRange(Methods.Where(x => x != FocusedFeature));
             if (OptionsMenu != null)
                 ret.Add(OptionsMenu);
+            if (FocusedFeature != null)
+                ret.Add(FocusedFeature);
+            ret.Add(NameTextBox);
+            ret.AddRange(Properties.Where(x => x != FocusedFeature));
+            ret.AddRange(Methods.Where(x => x != FocusedFeature));
             return ret;
         }
 
@@ -144,7 +156,10 @@ namespace UML_Editor.Nodes
             NameTextBox.Render(renderer);
             Properties.ForEach(x => x.Render(renderer));
             Methods.ForEach(x => x.Render(renderer));
+            NameLine.Render(renderer);
+            SeparatorLine.Render(renderer);
             FocusedFeature?.AccessModifiersContextMenu?.Render(renderer);
+            BorderElement.BorderOnly(renderer);
             OptionsMenu?.Render(renderer);
         }
 
@@ -180,6 +195,7 @@ namespace UML_Editor.Nodes
         {
             if (OptionsMenu == null)
             {
+                FocusedFeature?.OnUnfocused?.Invoke(this, new EventArgs());
                 TriggerAreas.Add(new RectangleHitbox(OptionsPrefab.Position, OptionsPrefab.Width, OptionsPrefab.Height));
                 OptionsMenu = OptionsPrefab;
             }
@@ -197,14 +213,24 @@ namespace UML_Editor.Nodes
         private void OnFeatureFocused(object sender, EventArgs e)
         {
             if(FocusedFeature == null)
+            {
                 FocusedFeature = (FeatureNode)sender;
+                if(OptionsMenu != null)
+                {
+                    TriggerAreas.RemoveAt(1);
+                    OptionsMenu = null;
+                }
+            }
             else
             {
-                FocusedFeature.ShowMenu();
+                FocusedFeature.OnUnfocused(this, new EventArgs());
+                FocusedFeature = (FeatureNode)sender;
             }
         }
         private void OnFeatureUnfocused(object sender, EventArgs e)
         {
+            if (FocusedFeature?.AccessModifiersContextMenu != null)
+                FocusedFeature.ShowMenu();
             FocusedFeature = null;
         }
     }
