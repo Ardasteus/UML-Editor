@@ -32,7 +32,6 @@ namespace UML_Editor.Nodes
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
-
         public AccessModifiers AccessModifier { get; set; }
         public Modifiers Modifier { get; set; }
         public bool IsMenuShown { get; set; } = false;
@@ -58,7 +57,7 @@ namespace UML_Editor.Nodes
         public void GeneratePrefab()
         {
             int biggest = Renderer.GetTextWidth("Protected".Length);
-            MenuPrefab = new ContextMenuNode("cnt", Position + new Vector(AccessModifierButton.Position.X + Renderer.SingleTextWidth, 0), biggest, 0, RectangleRenderElementStyle.Default);
+            MenuPrefab = new ContextMenuNode("cnt", AccessModifierButton.Position + new Vector(AccessModifierButton.Width, 0), biggest, 0, RectangleRenderElementStyle.Default);
             MenuPrefab.AddNode(new ButtonNode("btn1", "Public", Vector.Zero, MenuPrefab.Width, Renderer.SingleTextHeight, () =>
             {
                 AccessModifier = AccessModifiers.Public;
@@ -104,12 +103,14 @@ namespace UML_Editor.Nodes
                 TriggerAreas.Add(new RectangleHitbox(MenuPrefab.Position, MenuPrefab.Width, MenuPrefab.Height));
                 AccessModifiersContextMenu = MenuPrefab;
                 IsMenuShown = true;
+                OnFocused?.Invoke(this, new EventArgs());
             }
             else
             {
                 TriggerAreas.RemoveAt(1);
                 AccessModifiersContextMenu = null;
                 IsMenuShown = false;
+                OnUnfocused?.Invoke(this, new EventArgs());
             }
         }
         public EventHandler<ResizeEventArgs> OnResize { get; set; }

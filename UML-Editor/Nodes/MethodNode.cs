@@ -35,6 +35,11 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Position = value;
                 ((RectangleHitbox)TriggerAreas[0]).Position = value;
+                AccessModifierButton.Position = value;
+                NameTextBox.Position = Position + new Vector(AccessModifierButton.Width, 0);
+                ArgumentsTextBox.Position = Position + new Vector(AccessModifierButton.Width + NameTextBox.Width, 0);
+                TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width + ArgumentsTextBox.Width, Position.Y);
+                GeneratePrefab();
             }
         }
         public override int Width

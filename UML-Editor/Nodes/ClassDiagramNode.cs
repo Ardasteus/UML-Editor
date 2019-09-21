@@ -15,6 +15,7 @@ namespace UML_Editor.Nodes
 {
     public class ClassDiagramNode : UMLDiagram, IOptionsNode
     {
+        private FeatureNode FocusedFeature;
         public override Vector Position
         {
             get => BorderElement.Position;
@@ -22,6 +23,7 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Position = value;
                 ((RectangleHitbox)TriggerAreas[0]).Position = value;
+                Resize(this, new ResizeEventArgs(Width));
             }
         }
         public override int Width
@@ -62,17 +64,20 @@ namespace UML_Editor.Nodes
 
         public void AddProperty(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
         {
-            PropertyNode new_prop = new PropertyNode("prop", Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
+            PropertyNode new_prop = new PropertyNode("prop", Position + new Vector(0, (Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
             new_prop.OnResize = Resize;
+            new_prop.OnFocused = OnFeatureFocused;
+            new_prop.OnUnfocused = OnFeatureUnfocused;
             Properties.Add(new_prop);
             Height += Renderer.SingleTextHeight;
             Resize(this, new ResizeEventArgs(new_prop.Width));
-
         }
         public void AddMethod(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
         {
             MethodNode new_method = new MethodNode("prop", Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
             new_method.OnResize = Resize;
+            new_method.OnFocused = OnFeatureFocused;
+            new_method.OnUnfocused = OnFeatureUnfocused;
             Methods.Add(new_method);
             Height += Renderer.SingleTextHeight;
             Resize(this, new ResizeEventArgs(new_method.Width));
@@ -93,6 +98,14 @@ namespace UML_Editor.Nodes
                 }
             }
             NameTextBox.Position = new Vector((Position.X + Width / 2) - (NameTextBox.Width / 2), Position.Y);
+            for (int i = 0; i < Properties.Count; i++)
+            {
+                Properties[i].Position = Position + new Vector(0, (i + 1) * Renderer.SingleTextHeight);
+            }
+            for (int i = 0; i < Methods.Count; i++)
+            {
+                Methods[i].Position = Position + new Vector(0, (i + Properties.Count + 1) * Renderer.SingleTextHeight);
+            }
         }
 
         private void NameResize(object sender, ResizeEventArgs args)
@@ -116,8 +129,10 @@ namespace UML_Editor.Nodes
         {
             List<INode> ret = new List<INode>();
             ret.Add(NameTextBox);
-            ret.AddRange(Properties);
-            ret.AddRange(Methods);
+            if (FocusedFeature != null)
+                ret.Add(FocusedFeature);
+            ret.AddRange(Properties.Where(x => x != FocusedFeature));
+            ret.AddRange(Methods.Where(x => x != FocusedFeature));
             if (OptionsMenu != null)
                 ret.Add(OptionsMenu);
             return ret;
@@ -129,6 +144,7 @@ namespace UML_Editor.Nodes
             NameTextBox.Render(renderer);
             Properties.ForEach(x => x.Render(renderer));
             Methods.ForEach(x => x.Render(renderer));
+            FocusedFeature?.AccessModifiersContextMenu?.Render(renderer);
             OptionsMenu?.Render(renderer);
         }
 
@@ -176,6 +192,20 @@ namespace UML_Editor.Nodes
 
         public void HandleMouse()
         {
+        }
+
+        private void OnFeatureFocused(object sender, EventArgs e)
+        {
+            if(FocusedFeature == null)
+                FocusedFeature = (FeatureNode)sender;
+            else
+            {
+                FocusedFeature.ShowMenu();
+            }
+        }
+        private void OnFeatureUnfocused(object sender, EventArgs e)
+        {
+            FocusedFeature = null;
         }
     }
 }
