@@ -12,6 +12,7 @@ using UML_Editor.Enums;
 using UML_Editor.Others;
 using UML_Editor.Nodes.Interfaces;
 using UML_Editor.Relationships;
+using UML_Editor.CodeGenerating;
 
 namespace UML_Editor
 {
@@ -282,6 +283,21 @@ namespace UML_Editor
                 OptionsMenu = null;
             },
             RectangleRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Export", mouse_positon, Renderer.GetTextWidth(6), Renderer.SingleTextHeight, () =>
+            {
+                GenerateCode();
+                OptionsMenu = null;
+            },
+            RectangleRenderElementStyle.Default));
+        }
+
+        private void GenerateCode()
+        {
+            foreach (ClassDiagramNode classNode in Nodes.OfType<ClassDiagramNode>())
+            {
+                CodeGenerator generator = new CodeGenerator("D:\\Testing\\" + classNode.NameTextBox.Text + ".cs", classNode);
+                generator.GenerateClass();
+            }
         }
     }
 }

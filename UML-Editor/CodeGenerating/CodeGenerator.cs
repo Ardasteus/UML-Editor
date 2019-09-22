@@ -14,27 +14,44 @@ namespace UML_Editor.CodeGenerating
 {
     public class CodeGenerator
     {
-        public DirectoryInfo OutputDirectory { get; set; }
+        public string Output { get; set; }
         CodeCompileUnit TargetUnit;
         CodeTypeDeclaration TargetClass;
         ClassDiagramNode ClassNode;
-        public CodeGenerator(DirectoryInfo directory, ClassDiagramNode class_node)
+        public CodeGenerator(string output, ClassDiagramNode class_node)
         {
-            OutputDirectory = directory;
+            Output = output;
             TargetUnit = new CodeCompileUnit();
-            TargetClass = new CodeTypeDeclaration(class_node.NameTextBox.Name);
+            TargetClass = new CodeTypeDeclaration(class_node.NameTextBox.Text);
             ClassNode = class_node;
         }
 
         public bool GenerateClass()
         {
-            CodeNamespace Namespaces = new CodeNamespace("Uml_Editor_Generated");
-            Namespaces.Imports.Add(new CodeNamespaceImport("System"));
-            TargetClass.IsClass = true;
-            TargetClass.TypeAttributes = TypeAttributes.Public;
-            Namespaces.Types.Add(TargetClass);
-            TargetUnit.Namespaces.Add(Namespaces);
-            return true;
+           // try
+            //{
+                CodeNamespace Namespaces = new CodeNamespace("Uml_Editor_Generated");
+                Namespaces.Imports.Add(new CodeNamespaceImport("System"));
+                TargetClass.IsClass = true;
+                TargetClass.TypeAttributes = TypeAttributes.Public;
+                Namespaces.Types.Add(TargetClass);
+                TargetUnit.Namespaces.Add(Namespaces);
+                foreach (PropertyNode item in ClassNode.Properties)
+                {
+                    AddProperty(item);
+                }
+                foreach (MethodNode item in ClassNode.Methods)
+                {
+                    AddMethod(item);
+                }
+            GenerateCode();
+                return true;
+            //}
+            //catch (Exception)
+            //{
+            //    throw;
+            //    return false;
+            //}
         }
         private void AddProperty(PropertyNode propertyNode)
         {
@@ -66,7 +83,46 @@ namespace UML_Editor.CodeGenerating
             newMethod.Attributes = MemberAttributes.Public;
             newMethod.Name = methodNode.NameTextBox.Name;
             newMethod.ReturnType = new CodeTypeReference(methodNode.TypeTextBox.Name);
-            newMethod.Parameters.Add(new CodeParameterDeclarationExpression)
+            List<string> param_types = methodNode.ArgumentsTextBox.Text.Split(',').Select(x => x.Split(' ')[0]).ToList();
+            List<string> param_names = methodNode.ArgumentsTextBox.Text.Split(',').Select(x => x.Split(' ')[1]).ToList();
+            for (int i = 0; i < param_names.Count; i++)
+            {
+                newMethod.Parameters.Add(new CodeParameterDeclarationExpression(param_types[i], param_names[i]));
+                TargetClass.Members.Add(newMethod);
+            }
+        }
+        private void GenerateConstructor()
+        {
+            CodeConstructor constructor = new CodeConstructor();
+            constructor.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+            foreach (var item in TargetClass.Members)
+            {
+                if(item is CodeMemberProperty prop)
+                {
+                    constructor.Parameters.Add(new CodeParameterDeclarationExpression(
+                        prop.Type, "_" + prop.Name.ToLower()));
+                    CodeFieldReferenceExpression fieldReference =
+                        new CodeFieldReferenceExpression(
+                            new CodeThisReferenceExpression(), prop.Name.ToLower());
+                    constructor.Statements.Add(new CodeAssignStatement(fieldReference,
+                        new CodeArgumentReferenceExpression("_" + prop.Name.ToLower())));
+                }
+            }
+            TargetClass.Members.Add(constructor);
+        }
+        private void GenerateCode()
+        {
+            CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
+            CodeGeneratorOptions options = new CodeGeneratorOptions();
+            FileInfo outputfile = new FileInfo(Output);
+            options.BracingStyle = "C";
+            using (StreamWriter sourceWriter = new StreamWriter(outputfile.FullName))
+            {
+                provider.GenerateCodeFromCompileUnit(
+                    TargetUnit, sourceWriter, options);
+                sourceWriter.Close();
+            }
+            
         }
     }
 }

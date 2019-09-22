@@ -55,10 +55,6 @@ namespace UML_Editor.Relationships
         }
         private void DeterminePosition()
         {
-            if()
-            {
-
-            }
         }
     }
 }

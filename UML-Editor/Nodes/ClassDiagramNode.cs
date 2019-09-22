@@ -48,8 +48,8 @@ namespace UML_Editor.Nodes
                 ((RectangleHitbox)TriggerAreas[0]).Height = value;
             }
         }
-        private List<PropertyNode> Properties = new List<PropertyNode>();
-        private List<MethodNode> Methods = new List<MethodNode>();
+        public List<PropertyNode> Properties = new List<PropertyNode>();
+        public List<MethodNode> Methods = new List<MethodNode>();
         public Modifiers Modifier { get; set; }
         public AccessModifiers AccessModifier { get; set; }
         public ContextMenuNode OptionsPrefab { get; set; }
