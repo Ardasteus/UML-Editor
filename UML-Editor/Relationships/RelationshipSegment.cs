@@ -23,22 +23,25 @@ namespace UML_Editor.Relationships
         public EventHandler OnUnfocused { get; set; }
         private LineRenderElement LineElement;
         public ClassDiagramNode TargetNode { get; set; }
+        private Vector AnchorPosition;
 
         public RelationshipSegment(Vector position, ClassDiagramNode classDiagram)
         {
             Position = position;
             TargetNode = classDiagram;
-            LineElement = new LineRenderElement(position, classDiagram.Position, 1, Color.Black);
-            TargetNode.OnPositionChanged += OnPositionChanged;
+            AnchorPosition = classDiagram.Position + new Vector(classDiagram.Width / 2, classDiagram.Height / 2);
+            LineElement = new LineRenderElement(position, AnchorPosition, 1, Color.Black);
+            TargetNode.OnPositionChanged += OnNodePositionChanged;
         }
 
         public void Render(Renderer renderer)
         {
             LineElement.Render(renderer);
         }
-        private void OnPositionChanged(object sender, PositionEventArgs e)
+        private void OnNodePositionChanged(object sender, PositionEventArgs e)
         {
-            LineElement = new LineRenderElement(Position, e.Position, 1, Color.Black);
+            AnchorPosition = TargetNode.Position + new Vector(TargetNode.Width / 2, TargetNode.Height / 2);
+            LineElement = new LineRenderElement(Position, AnchorPosition, 1, Color.Black);
         }
     }
 }

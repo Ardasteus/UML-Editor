@@ -70,5 +70,9 @@ namespace UML_Editor.Rendering
         {
             return new Vector(left.X / right, left.Y / right);
         }
+        public static int GetDistance(Vector v)
+        {
+            return (int)Math.Sqrt((int)Math.Pow((double)v.X, 2) + (int)Math.Pow((double)v.Y, 2));
+        }
     }
 }
