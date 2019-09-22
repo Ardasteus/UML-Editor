@@ -81,7 +81,7 @@ namespace UML_Editor.CodeGenerating
         {
             CodeMemberMethod newMethod = new CodeMemberMethod();
             newMethod.Attributes = MemberAttributes.Public;
-            newMethod.Name = methodNode.NameTextBox.Name;
+            newMethod.Name = methodNode.NameTextBox.Text;
             newMethod.ReturnType = new CodeTypeReference(methodNode.TypeTextBox.Name);
             List<string> param_types = methodNode.ArgumentsTextBox.Text.Split(',').Select(x => x.Split(' ')[0]).ToList();
             List<string> param_names = methodNode.ArgumentsTextBox.Text.Split(',').Select(x => x.Split(' ')[1]).ToList();
