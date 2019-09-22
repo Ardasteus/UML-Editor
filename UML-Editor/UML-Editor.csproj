@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGenerating\CodeGenerator.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Enums\AccessModifiers.cs" />
     <Compile Include="Enums\Modifiers.cs" />
