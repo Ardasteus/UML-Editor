@@ -22,10 +22,10 @@ namespace UML_Editor
         private IKeyboardHandlerNode FocusedKeyboardNode;
         private ContextMenuNode OptionsPrefab;
         private ContextMenuNode OptionsMenu;
+        private ClassDiagramNode CurrentFocus;
         private bool IsCreatingRelationship = false;
         private ClassDiagramNode RelationshipOrigin { get; set; }
         private RelationshipManager RelationshipManager = new RelationshipManager();
-        private bool Intercept = false;
         private ClassDiagramNode Dragged;
         private Vector DraggingVector;
         public Editor(PictureBox renderTarget)
@@ -41,6 +41,7 @@ namespace UML_Editor
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            //InitializeRedrawTimer();
         }
         public void Render()
         {
@@ -88,9 +89,15 @@ namespace UML_Editor
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
             Vector mouse_position = e.Location - Renderer.Origin;
-            if (e.Button == MouseButtons.Left && Dragged != null)
+            if (e.Button == MouseButtons.Left)
             {
-                Dragged.Position = mouse_position + DraggingVector;
+                if (Dragged != null)
+                    Dragged.Position = mouse_position + DraggingVector;
+                else
+                {
+                    mouse_position = e.Location - Vector.Zero;
+                    Renderer.Origin = mouse_position + DraggingVector;
+                }
             }
             Render();
         }
@@ -100,8 +107,13 @@ namespace UML_Editor
             if (e.Button == MouseButtons.Left)
             {
                 Dragged = ((ClassDiagramNode)Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x)));
-                if(Dragged != null)
+                if (Dragged != null)
                     DraggingVector = Dragged.Position - mouse_position;
+                else
+                {
+                    mouse_position = e.Location - Vector.Zero;
+                    DraggingVector = Renderer.Origin - mouse_position;
+                }
             }
         }
         public void OnMouseUp(object sender, MouseEventArgs e)
@@ -110,7 +122,6 @@ namespace UML_Editor
             {
                 Dragged = null;
                 DraggingVector = null;
-                Intercept = true;
             }
         }
         public void OnMouseClick(object sender, MouseEventArgs e)

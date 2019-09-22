@@ -11,7 +11,7 @@ namespace UML_Editor.Rendering
     public class Renderer
     {
         private PictureBox plane;
-        public Vector Origin { get; private set; }
+        public Vector Origin { get; set; }
         private int width;
         private int height;
 
