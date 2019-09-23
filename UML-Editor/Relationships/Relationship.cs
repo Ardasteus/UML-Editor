@@ -7,6 +7,7 @@ using UML_Editor.Nodes;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
+using UML_Editor.Others;
 
 namespace UML_Editor.Relationships
 {
@@ -21,23 +22,21 @@ namespace UML_Editor.Relationships
             Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
             Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
             Position = (originPos + targetPos) / 2;
-            Vector JoinTargetrigin = null;
-            Vector Jointtarget = null;
-            int DistanceoriginX = Math.Abs(originPos.X - Position.X);
-            int DistanceoriginY = Math.Abs(originPos.Y - Position.Y);
-            if(DistanceoriginX > DistanceoriginY)
+            Vector JointOrigin = ((RectangleHitbox)origin.TriggerAreas[0]).DeterminePosition(Position);
+            Vector JointTarget = ((RectangleHitbox)target.TriggerAreas[0]).DeterminePosition(Position);
+            Position.X = JointOrigin.X;
+            Position.Y = JointTarget.Y;
+            if (origin.IsOnEdge(Position) || target.IsOnEdge(Position))
             {
-                JoinTargetrigin = new Vector(Position.X, originPos.Y);
-            }
-            else
-            {
-                JoinTargetrigin = new Vector(originPos.X, Position.Y);
+                Position.X = JointTarget.X;
+                Position.Y = JointOrigin.Y;
             }
 
-            Lines.Add(new LineRenderElement(Position, JoinTargetrigin, 1, Color.Black));
-            Lines.Add(new LineRenderElement(JoinTargetrigin, originPos, 1, Color.Black));
-            Origin = new RelationshipSegment(Position, origin);
-            Target = new RelationshipSegment(Position, target);
+            Origin = new RelationshipSegment(Position, JointOrigin, origin);
+            Target = new RelationshipSegment(Position, JointTarget, target);
+            Origin.OnAnchorRequest += SetAnchor;
+            Target.OnAnchorRequest += SetAnchor;
+            Target.SetRelationshipType();
         }
         public void Changeorigin(ClassDiagramNode classDiagram)
         {
@@ -53,8 +52,44 @@ namespace UML_Editor.Relationships
             Origin.Render(renderer);
             Lines.ForEach(x => x.Render(renderer));
         }
-        private void DeterminePosition()
+        
+        private void SetAnchor(object sender, EventArgs e)
         {
+            ClassDiagramNode origin = Origin.TargetNode;
+            ClassDiagramNode target = Target.TargetNode;
+            Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
+            Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
+            Position = (originPos + targetPos) / 2;
+            Vector JointOrigin = ((RectangleHitbox)origin.TriggerAreas[0]).DeterminePosition(Position);
+            Vector JointTarget = ((RectangleHitbox)target.TriggerAreas[0]).DeterminePosition(Position);
+            Position.X = JointOrigin.X;
+            Position.Y = JointTarget.Y;
+            if (origin.IsOnEdge(Position) || target.IsOnEdge(Position))
+            {
+                Position.X = JointTarget.X;
+                Position.Y = JointOrigin.Y;
+            }
+
+            Origin.Position = Position;
+            Origin.AnchorPosition = JointOrigin;
+            Target.Position = Position;
+            Target.AnchorPosition = JointTarget;
+        }
+
+        private void SetVectors(ClassDiagramNode origin, ClassDiagramNode target)
+        {
+            Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
+            Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
+            Position = (originPos + targetPos) / 2;
+            Vector JointOrigin = ((RectangleHitbox)origin.TriggerAreas[0]).DeterminePosition(Position);
+            Vector JointTarget = ((RectangleHitbox)target.TriggerAreas[0]).DeterminePosition(Position);
+            Position.X = JointOrigin.X;
+            Position.Y = JointTarget.Y;
+            if (origin.IsOnEdge(Position) || target.IsOnEdge(Position))
+            {
+                Position.X = JointTarget.X;
+                Position.Y = JointOrigin.Y;
+            }
         }
     }
 }

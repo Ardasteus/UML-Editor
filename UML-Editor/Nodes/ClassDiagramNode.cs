@@ -82,8 +82,8 @@ namespace UML_Editor.Nodes
         {
             MethodNode new_method = new MethodNode("prop", Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
             new_method.OnResize = Resize;
-            new_method.OnFocused = OnFeatureFocused;
-            new_method.OnUnfocused = OnFeatureUnfocused;
+            //new_method.OnFocused = OnFeatureFocused;
+            //new_method.OnUnfocused = OnFeatureUnfocused;
             Methods.Add(new_method);
             Height += Renderer.SingleTextHeight;
             Resize(this, new ResizeEventArgs(new_method.Width));
@@ -232,8 +232,21 @@ namespace UML_Editor.Nodes
         private void OnFeatureUnfocused(object sender, EventArgs e)
         {
             if (FocusedFeature?.AccessModifiersContextMenu != null)
-                FocusedFeature.ShowMenu();
+            {
+                FocusedFeature.TriggerAreas.RemoveAt(1);
+                FocusedFeature.AccessModifiersContextMenu = null;
+                FocusedFeature.IsMenuShown = false;
+            }
             FocusedFeature = null;
+        }
+
+        public bool IsOnEdge(Vector v)
+        {
+            int left = Position.X;
+            int right = Position.X + Width;
+            int top = Position.Y;
+            int bot = Position.Y + Height;
+            return v.X == left || v.X == right || v.Y == top || v.Y == bot;
         }
     }
 }

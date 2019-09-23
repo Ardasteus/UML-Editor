@@ -44,6 +44,7 @@ namespace UML_Editor.CodeGenerating
                 {
                     AddMethod(item);
                 }
+            GenerateConstructor();
             GenerateCode();
                 return true;
             //}
@@ -82,7 +83,10 @@ namespace UML_Editor.CodeGenerating
             CodeMemberMethod newMethod = new CodeMemberMethod();
             newMethod.Attributes = MemberAttributes.Public;
             newMethod.Name = methodNode.NameTextBox.Text;
-            newMethod.ReturnType = new CodeTypeReference(methodNode.TypeTextBox.Name);
+            if(methodNode.TypeTextBox.Text == "void")
+                newMethod.ReturnType = new CodeTypeReference(   );
+            else
+                newMethod.ReturnType = new CodeTypeReference(new CodeTypeParameter(methodNode.TypeTextBox.Text));
             List<string> param_types = methodNode.ArgumentsTextBox.Text.Split(',').Select(x => x.Split(' ')[0]).ToList();
             List<string> param_names = methodNode.ArgumentsTextBox.Text.Split(',').Select(x => x.Split(' ')[1]).ToList();
             for (int i = 0; i < param_names.Count; i++)
@@ -103,9 +107,9 @@ namespace UML_Editor.CodeGenerating
                         prop.Type, "_" + prop.Name.ToLower()));
                     CodeFieldReferenceExpression fieldReference =
                         new CodeFieldReferenceExpression(
-                            new CodeThisReferenceExpression(), prop.Name.ToLower());
+                            new CodeThisReferenceExpression(), prop.Name);
                     constructor.Statements.Add(new CodeAssignStatement(fieldReference,
-                        new CodeArgumentReferenceExpression("_" + prop.Name.ToLower())));
+                        new CodeArgumentReferenceExpression("_" + prop.Name)));
                 }
             }
             TargetClass.Members.Add(constructor);

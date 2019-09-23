@@ -85,6 +85,8 @@ namespace UML_Editor.Rendering.RenderingElements
             StartPoint = from;
             EndPoint = to;
             Width = width;
+            EndCap = LineCap.NoAnchor;
+            StartCap = LineCap.NoAnchor;
         }
 
         public void Render(Renderer renderer)

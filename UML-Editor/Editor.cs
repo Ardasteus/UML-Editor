@@ -42,6 +42,11 @@ namespace UML_Editor
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            AddNode(new ClassDiagramNode(Vector.Zero, "Class", Modifiers.None, AccessModifiers.Public));
+            ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Nodes[1]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Nodes[1]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             //InitializeRedrawTimer();
         }
         public void Render()

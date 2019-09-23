@@ -19,5 +19,7 @@ namespace UML_Editor.Relationships
         {
             Relationships.ForEach(x => x.Render(renderer));
         }
+
+
     }
 }

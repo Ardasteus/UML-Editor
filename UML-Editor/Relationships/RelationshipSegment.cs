@@ -14,7 +14,11 @@ namespace UML_Editor.Relationships
     public class RelationshipSegment : IRenderableNode
     {
         public string Name { get; set; }
-        public Vector Position { get; set; }
+        public Vector Position
+        {
+            get => LineElement.StartPoint;
+            set => LineElement.StartPoint = value;
+        }
         public int Width { get; set; }
         public int Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; }
@@ -23,14 +27,16 @@ namespace UML_Editor.Relationships
         public EventHandler OnUnfocused { get; set; }
         private LineRenderElement LineElement;
         public ClassDiagramNode TargetNode { get; set; }
-        private Vector AnchorPosition;
-
-        public RelationshipSegment(Vector position, ClassDiagramNode classDiagram)
+        public Vector AnchorPosition
         {
-            Position = position;
+            get => LineElement.EndPoint;
+            set => LineElement.EndPoint = value;
+        }
+
+        public RelationshipSegment(Vector position, Vector anchor, ClassDiagramNode classDiagram)
+        {
             TargetNode = classDiagram;
-            AnchorPosition = classDiagram.Position + new Vector(classDiagram.Width / 2, classDiagram.Height / 2);
-            LineElement = new LineRenderElement(position, AnchorPosition, 1, Color.Black);
+            LineElement = new LineRenderElement(position, anchor, 1, Color.Black);
             TargetNode.OnPositionChanged += OnNodePositionChanged;
         }
 
@@ -40,8 +46,14 @@ namespace UML_Editor.Relationships
         }
         private void OnNodePositionChanged(object sender, PositionEventArgs e)
         {
-            AnchorPosition = TargetNode.Position + new Vector(TargetNode.Width / 2, TargetNode.Height / 2);
-            LineElement = new LineRenderElement(Position, AnchorPosition, 1, Color.Black);
+            OnAnchorRequest?.Invoke(this, new EventArgs());
+        }
+
+        public EventHandler OnAnchorRequest;
+
+        public void SetRelationshipType()
+        {
+            LineElement.EndCap = System.Drawing.Drawing2D.LineCap.DiamondAnchor;
         }
     }
 }

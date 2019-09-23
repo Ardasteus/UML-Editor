@@ -102,14 +102,12 @@ namespace UML_Editor.Nodes
             {
                 TriggerAreas.Add(new RectangleHitbox(MenuPrefab.Position, MenuPrefab.Width, MenuPrefab.Height));
                 AccessModifiersContextMenu = MenuPrefab;
-                IsMenuShown = true;
                 OnFocused?.Invoke(this, new EventArgs());
             }
             else
             {
                 TriggerAreas.RemoveAt(1);
                 AccessModifiersContextMenu = null;
-                IsMenuShown = false;
                 OnUnfocused?.Invoke(this, new EventArgs());
             }
         }
