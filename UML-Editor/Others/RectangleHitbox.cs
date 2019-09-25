@@ -36,7 +36,6 @@ namespace UML_Editor.Others
             int right = Position.X + Width;
             int top = Position.Y;
             int bot = Position.Y + Height;
-            //Left
             if (middle_point.Y <= bot && middle_point.Y >= top)
             {
                 if (middle_point.X > left && middle_point.X > right)

@@ -82,8 +82,8 @@ namespace UML_Editor.Nodes
         {
             MethodNode new_method = new MethodNode("prop", Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
             new_method.OnResize = Resize;
-            //new_method.OnFocused = OnFeatureFocused;
-            //new_method.OnUnfocused = OnFeatureUnfocused;
+            new_method.OnFocused = OnFeatureFocused;
+            new_method.OnUnfocused = OnFeatureUnfocused;
             Methods.Add(new_method);
             Height += Renderer.SingleTextHeight;
             Resize(this, new ResizeEventArgs(new_method.Width));
@@ -119,6 +119,10 @@ namespace UML_Editor.Nodes
                 PropertyNode prop = Properties.Last();  
                 SeparatorLine.StartPoint = prop.Position + new Vector(0, Renderer.SingleTextHeight);
                 SeparatorLine.EndPoint = prop.Position + new Vector(Width, Renderer.SingleTextHeight);
+            }
+            else
+            {
+                SeparatorLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             }
         }
 
@@ -214,7 +218,15 @@ namespace UML_Editor.Nodes
 
         private void OnFeatureFocused(object sender, EventArgs e)
         {
-            if(FocusedFeature == null)
+            if(FocusedFeature == sender)
+            {
+                if (OptionsMenu != null)
+                {
+                    TriggerAreas.RemoveAt(1);
+                    OptionsMenu = null;
+                }
+            }
+            else if(FocusedFeature == null)
             {
                 FocusedFeature = (FeatureNode)sender;
                 if(OptionsMenu != null)

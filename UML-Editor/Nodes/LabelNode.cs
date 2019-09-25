@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UML_Editor.Others;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
+using System.Drawing;
 
 namespace UML_Editor.Nodes
 {
@@ -18,6 +19,7 @@ namespace UML_Editor.Nodes
             set
             {
                 BorderElement.Position = value;
+                TextElement.Position = value;
                 ((RectangleHitbox)TriggerAreas[0]).Position = value;
             }
         }
@@ -40,18 +42,55 @@ namespace UML_Editor.Nodes
                 ((RectangleHitbox)TriggerAreas[0]).Height = value;
             }
         }
+        public Color BorderColor
+        {
+            get => BorderElement.BorderColor;
+            set => BorderElement.BorderColor = value;
+        }
+        public Color FillColor
+        {
+            get => BorderElement.FillColor;
+            set => BorderElement.FillColor = value;
+        }
+        public int BorderWidth
+        {
+            get => BorderElement.BorderWidth;
+            set => BorderElement.BorderWidth = value;
+        }
+        public Color TextColor
+        {
+            get => TextElement.Color;
+            set => TextElement.Color = value;
+        }
+        public FontStyle TextStyle
+        {
+            get => TextElement.FontStyle;
+            set => TextElement.FontStyle = value;
+        }
+        public int TextSize
+        {
+            get => TextElement.FontSize;
+            set => TextElement.FontSize = value;
+        }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         private RectangleRenderElement BorderElement;
         private TextRenderElement TextElement;
 
-
-        public void ForceResize(int width)
+        public LabelNode(string name, string text, Vector position)
         {
+            Name = name;
+            BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(text.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
+            TextElement = new TextRenderElement(position, text, Color.Black);
+            TextSize = 12;
         }
+
 
         public void Render(Renderer renderer)
         {
+            BorderElement.Render(renderer);
+            TextElement.Render(renderer);
         }
+
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
         public EventHandler OnFocused { get; set; }
         public EventHandler OnUnfocused { get; set; }
