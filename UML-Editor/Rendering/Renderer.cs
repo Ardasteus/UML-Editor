@@ -16,7 +16,7 @@ namespace UML_Editor.Rendering
         public Vector Origin { get; set; }
         private int width;
         private int height;
-
+        public float Scale { get; set; } = 1f;
         public Renderer(PictureBox pic)
         {
             plane = pic;
@@ -34,6 +34,7 @@ namespace UML_Editor.Rendering
         {
             using (Graphics g = GetGraphics())
             {
+                g.ScaleTransform(Scale, Scale);
                 g.DrawLine(draw_pen, from + Origin, to + Origin);
             }
         }
@@ -48,6 +49,7 @@ namespace UML_Editor.Rendering
             Rectangle rect = new Rectangle((int)(position.X + Origin.X), (int)(position.Y + Origin.Y), width, height);
             using (Graphics g = GetGraphics())
             {
+                g.ScaleTransform(Scale, Scale);
                 if (fill_brush != null)
                 {
                     g.FillRectangle(fill_brush, rect);
@@ -60,15 +62,10 @@ namespace UML_Editor.Rendering
         {
             using (Graphics g = GetGraphics())
             {
+                g.ScaleTransform(Scale, Scale);
                 g.DrawString(text, font, brush, position + Origin);
             }
         }
-
-        public void DrawTriangle(Vector A, Vector B, Vector C, Pen draw_pen)
-        {
-
-        }
-
         public void Render()
         {
             plane.Refresh();

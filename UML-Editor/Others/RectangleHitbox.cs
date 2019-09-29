@@ -31,60 +31,37 @@ namespace UML_Editor.Others
             return position.X <= right && position.X >= left && position.Y <= bot && position.Y >= top;
         }
 
-        public Vector GetCenter()
+        public static RectangleHitbox CreateFromLine(Vector start, Vector end, int width)
         {
-            float left = Position.X;
-            float right = Position.X + Width;
-            float top = Position.Y;
-            float bot = Position.Y + Height;
-            return new Vector((left + right) / 2, (top + bot) / 2);
-        }
-        
-        public Vector DeterminePosition(Vector middle_point)
-        {
-            float left = Position.X;
-            float right = Position.X + Width;
-            float top = Position.Y;
-            float bot = Position.Y + Height;
-            float xCenter = (left + right) / 2;
-            float yCenter = (top + bot) / 2;
-            Vector LeftAnchor = new Vector(left, yCenter);
-            Vector RightAnchor = new Vector(right, yCenter);
-            Vector TopAnchor = new Vector(xCenter, top);
-            Vector BotAnchor = new Vector(xCenter, bot);
-            Vector center = (new Vector((right + left) / 2, (top + bot) / 2) + middle_point) / 2;
-            if (center.Y <= bot && center.Y >= top)
+            Vector pos = Vector.Zero;
+            int height = 0;
+            if(start.Y < end.Y)
             {
-                if (center.X > left && center.X > right)
-                    return new Vector(right, center.Y);
-                else
-                    return new Vector(left, center.Y);
+                pos.Y = start.Y;
+                pos.X = start.X - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleHitbox(pos, width, height);
             }
-            else if (center.X <= right && center.X >= left)
+            else if(start.Y > end.Y)
             {
-                if (center.Y > top && center.Y > bot)
-                    return new Vector(center.X, bot);
-                else
-                    return new Vector(center.X, top);
+                pos.Y = end.Y;
+                pos.X = end.X - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleHitbox(pos, width, height);
+            }
+            else if(start.X < end.X)
+            {
+                pos.X = start.X;
+                pos.Y = start.Y - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleHitbox(pos, height, width);
             }
             else
             {
-                if (middle_point.X < left && middle_point.Y < top)
-                {
-                    return LeftAnchor;
-                }
-                else if (middle_point.X > right && middle_point.Y > bot)
-                {
-                    return RightAnchor;
-                }
-                else if (middle_point.X > right && middle_point.Y < top)
-                {
-                    return TopAnchor;
-                }
-                else
-                {
-                    return BotAnchor;
-                }
+                pos.X = end.X;
+                pos.Y = end.Y - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleHitbox(pos, height, width);
             }
         }
     }

@@ -73,5 +73,39 @@ namespace UML_Editor.Rendering.RenderingElements
         {
             renderer.DrawRectangle(Position, Width, Height, DrawPen);
         }
+
+        public static RectangleRenderElement CreateFromLine(Vector start, Vector end, int width)
+        {
+            Vector pos = Vector.Zero;
+            int height = 0;
+            if (start.Y < end.Y)
+            {
+                pos.Y = start.Y;
+                pos.X = start.X - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleRenderElement(pos, width, height, Color.White, Color.Violet);
+            }
+            else if (start.Y > end.Y)
+            {
+                pos.Y = end.Y;
+                pos.X = end.X - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleRenderElement(pos, width, height, Color.White, Color.Violet);
+            }
+            else if (start.X < end.X)
+            {
+                pos.X = start.X;
+                pos.Y = start.Y - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleRenderElement(pos, height, width, Color.White, Color.Violet);
+            }
+            else
+            {
+                pos.X = end.X;
+                pos.Y = end.Y - (width / 2);
+                height = Vector.GetDistance(start - end);
+                return new RectangleRenderElement(pos, height, width, Color.White, Color.Violet);
+            }
+        }
     }
 }

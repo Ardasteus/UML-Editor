@@ -9,14 +9,26 @@ using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
 using UML_Editor.Others;
 using UML_Editor.Geometry;
+using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Relationships
 {
-    public class Relationship
+    public class Relationship : IContainerNode, IOptionsNode
     {
-        public Vector Position { get; set; }
         public RelationshipSegment Origin { get; set; }
         public RelationshipSegment Target { get; set; }
+        public string Name { get; set; }
+        public Vector Position { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public List<IHitbox> TriggerAreas { get; set; }
+        public EventHandler<ResizeEventArgs> OnResize { get; set; }
+        public EventHandler OnFocused { get; set; }
+        public EventHandler OnUnfocused { get; set; }
+        public ContextMenuNode OptionsPrefab { get; set; }
+        public ContextMenuNode OptionsMenu { get; set; }
+        public bool isFocused { get; set; }
+
         private ClassDiagramNode OriginNode;
         private ClassDiagramNode TargetNode;
         public Relationship(ClassDiagramNode origin, ClassDiagramNode target)
@@ -28,23 +40,34 @@ namespace UML_Editor.Relationships
             Target = new RelationshipSegment(vectors[1], vectors[4], vectors[2]);
             OriginNode.OnPositionChanged += OnPositionChanged;
             TargetNode.OnPositionChanged += OnPositionChanged;
+            GeneratePrefab();
+            StealHitboxes();
         }
         public void Render(Renderer renderer)
         {
             Target.Render(renderer);
             Origin.Render(renderer);
+            OptionsMenu?.Render(renderer);
+        }
+
+        private void StealHitboxes()
+        {
+            TriggerAreas = new List<IHitbox>();
+            TriggerAreas.AddRange(Origin.TriggerAreas);
+            TriggerAreas.AddRange(Target.TriggerAreas);
         }
        
         private void OnPositionChanged(object sender, PositionEventArgs e)
         {
             List<Vector> vectors = GetLineVectors();
             Origin.Position = vectors[0];
-            Origin.JointPosition = vectors[3];
-            Origin.AnchorPosition = vectors[2];
+            Origin.Joint = vectors[3];
+            Origin.Midpoint = vectors[2];
 
             Target.Position = vectors[1];
-            Target.JointPosition = vectors[4];
-            Target.AnchorPosition = vectors[2];
+            Target.Joint = vectors[4];
+            Target.Midpoint = vectors[2];
+            StealHitboxes();
         }
 
         private List<Vector> GetLineVectors()
@@ -82,6 +105,43 @@ namespace UML_Editor.Relationships
                 Values.Add(new Vector(Values[1].X, Values[2].Y));
 
             return Values;
+        }
+
+        public List<INode> GetChildren()
+        {
+            List<INode> Children = new List<INode>();
+            if (OptionsMenu != null)
+                Children.Add(OptionsMenu);
+            return Children;
+        }
+        public void GeneratePrefab()
+        {
+            OptionsPrefab = new ContextMenuNode("cnt", Vector.Zero, 0, 0, RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Test", Vector.Zero, Renderer.GetTextWidth(12), Renderer.SingleTextHeight, () =>
+            {
+                OptionsMenu = null;
+                TriggerAreas.RemoveAt(1);
+                GeneratePrefab();
+            },
+            RectangleRenderElementStyle.Default));
+        }
+
+        public void ShowOptionsMenu()
+        {
+            if (OptionsMenu == null)
+            {
+                TriggerAreas.Add(new RectangleHitbox(OptionsPrefab.Position, OptionsPrefab.Width, OptionsPrefab.Height));
+                OptionsMenu = OptionsPrefab;
+            }
+            else
+            {
+                TriggerAreas.RemoveAt(TriggerAreas.Count - 1);
+                OptionsMenu = null;
+            }
+        }
+
+        public void HandleMouse()
+        {
         }
     }
 }

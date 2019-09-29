@@ -23,7 +23,8 @@ namespace UML_Editor
         private IKeyboardHandlerNode FocusedKeyboardNode;
         private ContextMenuNode OptionsPrefab;
         private ContextMenuNode OptionsMenu;
-        private ClassDiagramNode CurrentFocus;
+        private ClassDiagramNode CurrentFocusedDiagram;
+        private Relationship CurrentFocusedRelationship;
         private bool IsCreatingRelationship = false;
         private ClassDiagramNode RelationshipOrigin { get; set; }
         private RelationshipManager RelationshipManager = new RelationshipManager();
@@ -161,6 +162,8 @@ namespace UML_Editor
             INode temp = null;
             if (OptionsMenu != null && CheckIfClicked(mouse_position, OptionsMenu))
                 temp = OptionsMenu;
+            else if (RelationshipManager.Relationships.Count > 0 && RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x)) != null)
+                temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             else
                 temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             if (IsCreatingRelationship && temp != null && temp is UMLDiagram)
@@ -179,7 +182,7 @@ namespace UML_Editor
                 if (OptionsMenu != null)
                     OptionsMenu = null;
                 if (temp is ClassDiagramNode)
-                    CurrentFocus = (ClassDiagramNode)temp;
+                    CurrentFocusedDiagram = (ClassDiagramNode)temp;
                 IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
                 if (node != null)
                 {
@@ -209,10 +212,10 @@ namespace UML_Editor
 
                     node.isFocused = true;
                     node.HandleMouse();
-                    if (CurrentFocus != null)
+                    if (CurrentFocusedDiagram != null)
                     {
-                        CurrentFocus.Unfocus();
-                        CurrentFocus = null;
+                        CurrentFocusedDiagram.Unfocus();
+                        CurrentFocusedDiagram = null;
                     }
                 }
                 else
@@ -222,10 +225,10 @@ namespace UML_Editor
                         FocusedKeyboardNode.isFocused = false;
                         FocusedKeyboardNode = null;
                     }
-                    if (CurrentFocus != null)
+                    if (CurrentFocusedDiagram != null)
                     {
-                        CurrentFocus.Unfocus();
-                        CurrentFocus = null;
+                        CurrentFocusedDiagram.Unfocus();
+                        CurrentFocusedDiagram = null;
                     }
                 }
             }
@@ -242,10 +245,20 @@ namespace UML_Editor
             }
             if (temp == null)
             {
-                if (CurrentFocus != null)
+                temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            }
+            if (temp == null)
+            {
+                if (CurrentFocusedDiagram != null)
                 {
-                    CurrentFocus.Unfocus();
-                    CurrentFocus = null;
+                    CurrentFocusedDiagram.Unfocus();
+                    CurrentFocusedDiagram = null;
+                }
+                if(CurrentFocusedRelationship != null)
+                {
+                    if(CurrentFocusedRelationship.OptionsMenu != null)
+                        CurrentFocusedRelationship.ShowOptionsMenu();
+                    CurrentFocusedRelationship = null;
                 }
                 if (OptionsMenu == null)
                 {
@@ -257,12 +270,38 @@ namespace UML_Editor
                     OptionsMenu = null;
                 }
             }
-            else if(temp is IOptionsNode)
+            else if(temp is ClassDiagramNode || temp is Relationship || temp is IOptionsNode)
             {
-                CurrentFocus = (ClassDiagramNode)temp;
-                IOptionsNode op = SearchForOptionsNode(temp, mouse_position);
-                op.OptionsPrefab.Position = mouse_position;
-                op.ShowOptionsMenu();
+                if(temp is ClassDiagramNode cn)
+                {
+                    CurrentFocusedDiagram = (ClassDiagramNode)temp;
+                    IOptionsNode op = SearchForOptionsNode(temp, mouse_position);
+                    op.OptionsPrefab.Position = mouse_position;
+                    op.ShowOptionsMenu();
+                }
+                else if(temp is Relationship r)
+                {
+                    if(CurrentFocusedDiagram != null)
+                    {
+                        CurrentFocusedDiagram.Unfocus();
+                        CurrentFocusedDiagram = null;
+                    }
+                    if (CurrentFocusedRelationship != null)
+                    {
+                        if(CurrentFocusedRelationship != r)
+                        {
+                            CurrentFocusedRelationship.ShowOptionsMenu();
+                            CurrentFocusedRelationship = null;
+                        }
+                    }
+                    CurrentFocusedRelationship = r;
+                    if(r.OptionsMenu != null)
+                    {
+                        r.ShowOptionsMenu();
+                    }
+                    r.OptionsPrefab.Position = mouse_position;
+                    r.ShowOptionsMenu();
+                }
             }
         }
 
@@ -360,6 +399,10 @@ namespace UML_Editor
                 CodeGenerator generator = new CodeGenerator("D:\\Testing\\" + classNode.NameTextBox.Text + ".cs", classNode);
                 generator.GenerateClass();
             }
+        }
+
+        public void OnMouseWheel(object sender, MouseEventArgs e)
+        {
         }
     }
 }

@@ -9,62 +9,80 @@ using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
 using UML_Editor.Geometry;
+using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Relationships
 {
-    public class RelationshipSegment : IRenderableNode, IOptionsNode
+    public class RelationshipSegment : IRenderableNode
     {
         public string Name { get; set; }
         public Vector Position
         {
             get => SegmentStart.StartPoint;
-            set => SegmentStart.StartPoint = value;
+            set
+            {
+                SegmentStart.StartPoint = value;
+                CreateHitboxes();
+            }
         }
         public int Width { get; set; }
         public int Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
-        public EventHandler OnFocused { get; set; }
-        public EventHandler OnUnfocused { get; set; }
+        private List<RectangleRenderElement> DebugRectangles = new List<RectangleRenderElement>();
+
         private LineRenderElement SegmentStart;
         private LineRenderElement SegmentEnd;
-        public Vector JointPosition
+        public Vector Joint
         {
             get => SegmentStart.EndPoint;
             set
             {
                 SegmentStart.EndPoint = value;
                 SegmentEnd.StartPoint = value;
+                CreateHitboxes();
             }
         }
-        public Vector AnchorPosition
+        public Vector Midpoint
         {
             get => SegmentEnd.EndPoint;
-            set => SegmentEnd.EndPoint = value;
+            set
+            {
+                SegmentEnd.EndPoint = value;
+                CreateHitboxes();
+            }
         }
         public ContextMenuNode OptionsPrefab { get; set; }
         public ContextMenuNode OptionsMenu { get; set; }
         public bool isFocused { get; set; }
+        public EventHandler OnFocused { get; set; }
+        public EventHandler OnUnfocused { get; set; }
 
         public RelationshipSegment(Vector position, Vector joint, Vector anchor)
         {
             SegmentStart = new LineRenderElement(position, joint, 1, Color.Black);
             SegmentEnd = new LineRenderElement(joint, anchor, 1, Color.Black);
-            TriggerAreas.Add(new RectangleHitbox((position + joint) / 2, (int)(position.X + joint.X) / 2, (int)(position.Y + joint.Y) / 2));
-            TriggerAreas.Add(new RectangleHitbox((anchor + joint) / 2, (int)(anchor.X + joint.X) / 2, (int)(anchor.Y + joint.Y) / 2));
+            CreateHitboxes();
         }
         public void Render(Renderer renderer)
         {
             SegmentStart.Render(renderer);
             SegmentEnd.Render(renderer);
+            OptionsMenu?.Render(renderer);
+            DebugRectangles.ForEach(x => x.BorderOnly(renderer));
         }
 
-        public void ShowOptionsMenu()
+        private void CreateHitboxes()
         {
-        }
-
-        public void HandleMouse()
-        {
+            Vector position = SegmentStart.StartPoint;
+            Vector joint = SegmentStart.EndPoint;
+            Vector anchor = SegmentEnd.EndPoint;
+            TriggerAreas = new List<IHitbox>();
+            DebugRectangles = new List<RectangleRenderElement>();
+            TriggerAreas.Add(RectangleHitbox.CreateFromLine(position, joint, 10));
+            TriggerAreas.Add(RectangleHitbox.CreateFromLine(joint, anchor, 10));
+            DebugRectangles.Add(RectangleRenderElement.CreateFromLine(joint, anchor, 10));
+            DebugRectangles.Add(RectangleRenderElement.CreateFromLine(position, joint, 10));
         }
     }
 }

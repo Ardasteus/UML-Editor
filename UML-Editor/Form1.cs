@@ -26,6 +26,7 @@ namespace UML_Editor
             this.KeyPress += editor.OnKeyPress;
             this.KeyDown += editor.OnKeyDown;
             this.KeyUp += editor.OnKeyUp;
+            this.MouseWheel += editor.OnMouseWheel;
             editor.Render();
         }
     }
