@@ -12,6 +12,7 @@ using UML_Editor.Enums;
 using UML_Editor.Others;
 using UML_Editor.Relationships;
 using UML_Editor.CodeGenerating;
+using UML_Editor.Geometry;
 
 namespace UML_Editor
 {

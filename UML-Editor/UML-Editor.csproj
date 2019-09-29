@@ -56,6 +56,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Geometry\Line.cs" />
+    <Compile Include="Geometry\Šafránková.cs" />
     <Compile Include="Nodes\ButtonNode.cs" />
     <Compile Include="Nodes\ClassDiagramNode.cs" />
     <Compile Include="Nodes\ContextMenuNode.cs" />
@@ -95,7 +97,7 @@
     <Compile Include="Rendering\RenderingElements\LineRenderElement.cs" />
     <Compile Include="Rendering\RenderingElements\RectangleRenderElement.cs" />
     <Compile Include="Rendering\RenderingElements\TextRenderElement.cs" />
-    <Compile Include="Rendering\Vector.cs" />
+    <Compile Include="Geometry\Vector.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

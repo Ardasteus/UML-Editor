@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
-namespace UML_Editor.Rendering
+namespace UML_Editor.Geometry
 {
     public struct Vector
     {

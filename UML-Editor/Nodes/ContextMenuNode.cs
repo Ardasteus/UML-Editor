@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UML_Editor.Geometry;
 using UML_Editor.Others;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.ElementStyles;

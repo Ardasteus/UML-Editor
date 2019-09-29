@@ -8,6 +8,7 @@ using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
 using System.Windows.Forms;
 using UML_Editor.Others;
+using UML_Editor.Geometry;
 
 namespace UML_Editor.Nodes
 {

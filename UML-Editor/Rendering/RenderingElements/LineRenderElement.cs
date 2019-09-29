@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using UML_Editor.Geometry;
 
 namespace UML_Editor.Rendering.RenderingElements
 {

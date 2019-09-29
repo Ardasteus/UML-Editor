@@ -9,6 +9,7 @@ using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
 using UML_Editor.Others;
 using UML_Editor.Rendering.ElementStyles;
+using UML_Editor.Geometry;
 
 namespace UML_Editor.Nodes
 {
