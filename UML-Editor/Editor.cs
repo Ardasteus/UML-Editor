@@ -10,7 +10,6 @@ using UML_Editor.Nodes;
 using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Enums;
 using UML_Editor.Others;
-using UML_Editor.Nodes.Interfaces;
 using UML_Editor.Relationships;
 using UML_Editor.CodeGenerating;
 
@@ -37,12 +36,12 @@ namespace UML_Editor
             renderTarget.MouseDown += OnMouseDown;
             renderTarget.MouseUp += OnMouseUp;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddNode(new ClassDiagramNode(new Vector(-100, -100), "Class", Modifiers.None, AccessModifiers.Public));
+            AddDiagram(new ClassDiagramNode(new Vector(-100, -100), "Class", Modifiers.None, AccessModifiers.Public));
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            AddNode(new ClassDiagramNode(new Vector(100,100), "Class", Modifiers.None, AccessModifiers.Public));
+            AddDiagram(new ClassDiagramNode(new Vector(100, 100), "Class", Modifiers.None, AccessModifiers.Public));
             ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[1]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
@@ -63,9 +62,20 @@ namespace UML_Editor
             Renderer.Clear();
         }
 
-        public void AddNode(INode node)
+        public void AddDiagram(UMLDiagram node)
         {
             Nodes.Add(node);
+            node.OnRemoval += OnDiagramRemoval;
+        }
+
+        private void OnDiagramRemoval(object sender, DiagramRemovalEventArgs e)
+        {
+            RemoveDiagram(e.Diagram);
+        }
+        public void RemoveDiagram(UMLDiagram diagram)
+        {
+            Nodes.Remove(diagram);
+            diagram = null;
         }
 
         public void OnKeyPress(object sender, KeyPressEventArgs e)
@@ -220,10 +230,11 @@ namespace UML_Editor
                     OptionsMenu = null;
                 }
             }
-            else if(temp is IOptionsNode op)
+            else if(temp is IOptionsNode)
             {
+                IOptionsNode op = SearchForOptionsNode(temp, mouse_position);
                 op.OptionsPrefab.Position = mouse_position;
-                op.ShowMenu();
+                op.ShowOptionsMenu();
             }
         }
 
@@ -262,6 +273,24 @@ namespace UML_Editor
                 }
             }
             return null;
+        }
+        private IOptionsNode SearchForOptionsNode(INode parent_node, Vector mouse_position)
+        {
+            while(true)
+            {
+                if (parent_node is IContainerNode cn && parent_node is IOptionsNode op)
+                {
+                    INode n = cn.GetChildren().FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+                    if (n == null || !(n is IOptionsNode))
+                        return op;
+                    else
+                        parent_node = n;
+                }
+                else if (parent_node is IOptionsNode o)
+                    return o;
+                else
+                    return null;
+            }
         }
 
         private bool CheckIfClicked(Vector position, INode node)

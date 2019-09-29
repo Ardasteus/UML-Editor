@@ -90,6 +90,8 @@ namespace UML_Editor.Nodes
             List<INode> ret = new List<INode>();
             if (AccessModifiersContextMenu != null)
                 ret.Add(AccessModifiersContextMenu);
+            if (OptionsMenu != null)
+                ret.Add(OptionsMenu);
             ret.Add(AccessModifierButton);
             ret.Add(TypeTextBox);
             ret.Add(NameTextBox);
@@ -106,6 +108,8 @@ namespace UML_Editor.Nodes
             Separator.Render(renderer);
             if (AccessModifiersContextMenu != null)
                 AccessModifiersContextMenu.Render(renderer);
+            if (OptionsMenu != null)
+                OptionsMenu.Render(renderer);
         }
     }
 }

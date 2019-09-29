@@ -16,55 +16,57 @@ namespace UML_Editor.Relationships
         public Vector Position { get; set; }
         public RelationshipSegment Origin { get; set; }
         public RelationshipSegment Target { get; set; }
+        private ClassDiagramNode OriginNode;
+        private ClassDiagramNode TargetNode;
         public LineRenderElement Centerline { get; set; }
         public Relationship(ClassDiagramNode origin, ClassDiagramNode target)
         {
-            Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
-            Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
-            Position = (originPos + targetPos) / 2;
-            RectangleHitbox originHit = ((RectangleHitbox)origin.TriggerAreas[0]);
-            RectangleHitbox targetHit = ((RectangleHitbox)target.TriggerAreas[0]);
-            Vector JointOrigin = originHit.DeterminePosition(targetPos);
-            Vector JointTarget = targetHit.DeterminePosition(originPos);
-
-            Origin = new RelationshipSegment(Position, JointOrigin, origin);
-            Target = new RelationshipSegment(Position, JointTarget, target);
-            Origin.OnAnchorRequest += SetAnchor;
-            Target.OnAnchorRequest += SetAnchor;
-            Target.SetRelationshipType();
-            Centerline = new LineRenderElement(JointOrigin, JointTarget, 1, Color.Black);
-        }
-        public void ChangeOrigin(ClassDiagramNode classDiagram)
-        {
-            Origin.TargetNode = classDiagram;
-        }
-        public void ChangeDestination(ClassDiagramNode classDiagram)
-        {
-            Target.TargetNode = classDiagram;
+            OriginNode = origin;
+            TargetNode = target;
+            List<Vector> vectors = GetLineVectors();
+            Centerline = new LineRenderElement(vectors[0], vectors[1], 1, Color.Black);
+            OriginNode.OnPositionChanged += OnPositionChanged;
+            TargetNode.OnPositionChanged += OnPositionChanged;
         }
         public void Render(Renderer renderer)
         {
-            Target.Render(renderer);
-            Origin.Render(renderer);
+            //Target.Render(renderer);
+            //Origin.Render(renderer);
             Centerline.Render(renderer);
         }
-        
-        private void SetAnchor(object sender, EventArgs e)
+       
+        private void OnPositionChanged(object sender, PositionEventArgs e)
         {
-            ClassDiagramNode origin = Origin.TargetNode;
-            ClassDiagramNode target = Target.TargetNode;
-            Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
-            Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
-            Position = (originPos + targetPos) / 2;
-            RectangleHitbox originHit = (RectangleHitbox)origin.TriggerAreas[0];
-            RectangleHitbox targetHit = (RectangleHitbox)target.TriggerAreas[0];
-            Vector JointOrigin = originHit.DeterminePosition(targetPos);
-            Vector JointTarget = targetHit.DeterminePosition(originPos);
-            Origin.Position = Position;
-            Origin.AnchorPosition = JointOrigin;
-            Target.Position = Position;
-            Target.AnchorPosition = JointTarget;
-            Centerline = new LineRenderElement(JointOrigin, JointTarget, 1, Color.Black);
+            List<Vector> vectors = GetLineVectors();
+            Centerline = new LineRenderElement(vectors[0], vectors[1], 1, Color.Black);
         }
+
+        private List<Vector> GetLineVectors()
+        {
+            List<Vector> Values = new List<Vector>();
+            Vector OriginClosest = Vector.Zero;
+            Vector TargetClosest = Vector.Zero;
+            foreach (Vector org in OriginNode.GetSideCenters())
+            {
+                foreach (Vector tar in TargetNode.GetSideCenters())
+                {
+                    if (OriginClosest == Vector.Zero)
+                        OriginClosest = org;
+                    if (TargetClosest == Vector.Zero)
+                        TargetClosest = tar;
+
+                    if(Vector.GetDistance(tar - org) < Vector.GetDistance(OriginClosest - TargetClosest))
+                    {
+                        OriginClosest = org;
+                        TargetClosest = tar;
+                    }
+                }
+            }
+            Values.Add(OriginClosest);
+            Values.Add(TargetClosest);
+            Values.Add((OriginClosest + TargetClosest) / 2);
+            return Values;
+        }
+
     }
 }

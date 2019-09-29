@@ -8,7 +8,6 @@ using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
 using UML_Editor.Others;
-using UML_Editor.Nodes.Interfaces;
 using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Nodes
@@ -75,6 +74,9 @@ namespace UML_Editor.Nodes
             new_prop.OnResize = Resize;
             new_prop.OnFocused = OnFeatureFocused;
             new_prop.OnUnfocused = OnFeatureUnfocused;
+            new_prop.OnHitboxCreate += OnHitboxCreation;
+            new_prop.OnHitboxRemoval += OnHitboxRemoval;
+            new_prop.OnRemoval += OnFeatureRemoval;
             Properties.Add(new_prop);
             Height += Renderer.SingleTextHeight;
             Resize(this, new ResizeEventArgs(new_prop.Width));
@@ -85,9 +87,27 @@ namespace UML_Editor.Nodes
             new_method.OnResize = Resize;
             new_method.OnFocused = OnFeatureFocused;
             new_method.OnUnfocused = OnFeatureUnfocused;
+            new_method.OnHitboxCreate += OnHitboxCreation;
+            new_method.OnHitboxRemoval += OnHitboxRemoval;
+            new_method.OnRemoval += OnFeatureRemoval;
             Methods.Add(new_method);
             Height += Renderer.SingleTextHeight;
             Resize(this, new ResizeEventArgs(new_method.Width));
+        }
+
+        public void RemoveFeature(FeatureNode node)
+        {
+            if (node is MethodNode m)
+            {
+                Methods.Remove(m);
+            }
+            else if(node is PropertyNode p)
+            {
+                Properties.Remove(p);
+            }
+            Height -= Renderer.SingleTextHeight;
+            node = null;
+            Resize();
         }
 
         private void Resize(object sender, ResizeEventArgs args)
@@ -104,6 +124,11 @@ namespace UML_Editor.Nodes
                     Width = temp_node.Width;
                 }
             }
+            Resize();
+        }
+
+        private void Resize()
+        {
             NameTextBox.Position = new Vector((Position.X + Width / 2) - (NameTextBox.Width / 2), Position.Y);
             for (int i = 0; i < Properties.Count; i++)
             {
@@ -115,9 +140,9 @@ namespace UML_Editor.Nodes
             }
             NameLine.StartPoint = new Vector(Position.X, Position.Y + Renderer.SingleTextHeight);
             NameLine.EndPoint = new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight);
-            if(Properties.Count > 0)
+            if (Properties.Count > 0)
             {
-                PropertyNode prop = Properties.Last();  
+                PropertyNode prop = Properties.Last();
                 SeparatorLine.StartPoint = prop.Position + new Vector(0, Renderer.SingleTextHeight);
                 SeparatorLine.EndPoint = prop.Position + new Vector(Width, Renderer.SingleTextHeight);
             }
@@ -165,8 +190,9 @@ namespace UML_Editor.Nodes
             Methods.ForEach(x => x.Render(renderer));
             NameLine.Render(renderer);
             SeparatorLine.Render(renderer);
-            FocusedFeature?.AccessModifiersContextMenu?.Render(renderer);
             BorderElement.BorderOnly(renderer);
+            FocusedFeature?.AccessModifiersContextMenu?.Render(renderer);
+            FocusedFeature?.OptionsMenu?.Render(renderer);
             OptionsMenu?.Render(renderer);
         }
 
@@ -189,16 +215,16 @@ namespace UML_Editor.Nodes
                 GeneratePrefab();
             },
             RectangleRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Make into an interface", Vector.Zero, Renderer.GetTextWidth(22), Renderer.SingleTextHeight, () =>
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Remove", Vector.Zero, Renderer.GetTextWidth(6), Renderer.SingleTextHeight, () =>
             {
                 OptionsMenu = null;
                 TriggerAreas.RemoveAt(1);
-                GeneratePrefab();
+                OnRemoval?.Invoke(this, new DiagramRemovalEventArgs(this));
             },
             RectangleRenderElementStyle.Default));
         }
 
-        public void ShowMenu()
+        public void ShowOptionsMenu()
         {
             if (OptionsMenu == null)
             {
@@ -250,6 +276,11 @@ namespace UML_Editor.Nodes
                 FocusedFeature.AccessModifiersContextMenu = null;
                 FocusedFeature.IsMenuShown = false;
             }
+            else if(FocusedFeature?.OptionsMenu != null)
+            {
+                FocusedFeature.TriggerAreas.RemoveAt(1);
+                FocusedFeature.OptionsMenu = null;
+            }
             FocusedFeature = null;
         }
 
@@ -260,6 +291,34 @@ namespace UML_Editor.Nodes
             int top = Position.Y;
             int bot = Position.Y + Height;
             return v.X == left || v.X == right || v.Y == top || v.Y == bot;
+        }
+
+        public List<Vector> GetSideCenters()
+        {
+            int left = Position.X;
+            int right = Position.X + Width;
+            int top = Position.Y;
+            int bot = Position.Y + Height;
+            List<Vector> centers = new List<Vector>();
+            centers.Add(new Vector((left + right) / 2, top));
+            centers.Add(new Vector(right, (top + bot) / 2));
+            centers.Add(new Vector((left + right) / 2, bot));
+            centers.Add(new Vector(left, (top + bot) / 2));
+            return centers;
+        }
+
+        private void OnHitboxCreation(object sender, HitboxEventArgs e)
+        {
+            TriggerAreas.Add(e.Hitbox);
+        }
+        private void OnHitboxRemoval(object sender, HitboxEventArgs e)
+        {
+            TriggerAreas.Remove(e.Hitbox);
+        }
+
+        private void OnFeatureRemoval(object sender, FeatureRemovalEventArgs e)
+        {
+            RemoveFeature(e.FeatureNode);
         }
     }
 }

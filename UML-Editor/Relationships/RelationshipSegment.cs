@@ -26,40 +26,19 @@ namespace UML_Editor.Relationships
         public EventHandler OnFocused { get; set; }
         public EventHandler OnUnfocused { get; set; }
         private LineRenderElement LineElement;
-        public ClassDiagramNode TargetNode { get; set; }
         public Vector AnchorPosition
         {
             get => LineElement.EndPoint;
             set => LineElement.EndPoint = value;
         }
 
-        public RelationshipSegment(Vector position, Vector anchor, ClassDiagramNode classDiagram)
+        public RelationshipSegment(Vector position, Vector anchor)
         {
-            TargetNode = classDiagram;
             LineElement = new LineRenderElement(position, anchor, 1, Color.Black);
-            TargetNode.OnPositionChanged += OnNodePositionChanged;
-            TargetNode.OnResize += OnNodeResize;
         }
-
         public void Render(Renderer renderer)
         {
-            LineElement.Render(renderer);
-        }
-        private void OnNodePositionChanged(object sender, PositionEventArgs e)
-        {
-            OnAnchorRequest?.Invoke(this, new EventArgs());
-        }
-
-        private void OnNodeResize(object sender, ResizeEventArgs e)
-        {
-            OnAnchorRequest?.Invoke(this, new EventArgs());
-        }
-
-        public EventHandler OnAnchorRequest;
-
-        public void SetRelationshipType()
-        {
-            LineElement.EndCap = System.Drawing.Drawing2D.LineCap.DiamondAnchor;
+            //LineElement.Render(renderer);
         }
     }
 }

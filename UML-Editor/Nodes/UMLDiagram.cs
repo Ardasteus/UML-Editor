@@ -27,5 +27,6 @@ namespace UML_Editor.Nodes
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
         public EventHandler OnFocused { get; set; }
         public EventHandler OnUnfocused { get; set; }
+        public EventHandler<DiagramRemovalEventArgs> OnRemoval;
     }
 }

@@ -74,6 +74,9 @@
     <Compile Include="Nodes\PropertyNode.cs" />
     <Compile Include="Nodes\TextBoxNode.cs" />
     <Compile Include="Nodes\UMLDiagram.cs" />
+    <Compile Include="Others\DiagramRemovalEventArgs.cs" />
+    <Compile Include="Others\FeatureRemovalEventArgs.cs" />
+    <Compile Include="Others\HitboxEventArgs.cs" />
     <Compile Include="Others\IHitbox.cs" />
     <Compile Include="Others\PositionEventArgs.cs" />
     <Compile Include="Others\RectangleHitbox.cs" />

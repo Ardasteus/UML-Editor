@@ -12,7 +12,7 @@ using System.Drawing;
 
 namespace UML_Editor.Nodes
 {
-    public abstract class FeatureNode : IRenderableNode, IContainerNode
+    public abstract class FeatureNode : IRenderableNode, IContainerNode, IOptionsNode
     {
         public ContextMenuNode AccessModifiersContextMenu { get; set; }
         public ContextMenuNode MenuPrefab { get; set; }
@@ -26,6 +26,7 @@ namespace UML_Editor.Nodes
             Name = name;
             AccessModifier = accessModifier;
             Modifier = modifier;
+            GenerateOptionsMenu();
         }
 
         public string Name { get; set; }
@@ -33,8 +34,39 @@ namespace UML_Editor.Nodes
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
-        public AccessModifiers AccessModifier { get; set; }
-        public Modifiers Modifier { get; set; }
+        private AccessModifiers accessmodifier;
+        public AccessModifiers AccessModifier
+        {
+            get => accessmodifier;
+            set
+            {
+                accessmodifier = value;
+                if(AccessModifierButton != null)
+                    AccessModifierButton.Text = GetModifierChar();
+            }
+        }
+        private Modifiers modifier;
+        public Modifiers Modifier
+        {
+            get => modifier;
+            set
+            {
+                modifier = value;
+                if(NameTextBox != null)
+                    switch (Modifier)
+                    {
+                        case Modifiers.None:
+                            NameTextBox.TextStyle = FontStyle.Regular;
+                            break;
+                        case Modifiers.Static:
+                            NameTextBox.TextStyle = FontStyle.Underline;
+                            break;
+                        case Modifiers.Abstract:
+                            NameTextBox.TextStyle = FontStyle.Italic;
+                            break;
+                    }
+            }
+        }
         public bool IsMenuShown { get; set; } = false;
 
         public string GetModifierChar()
@@ -101,19 +133,104 @@ namespace UML_Editor.Nodes
         {
             if (AccessModifiersContextMenu == null)
             {
+                if(OptionsMenu != null)
+                {
+                    OnHitboxRemoval?.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                    TriggerAreas.RemoveAt(1);
+                    OptionsMenu = null;
+                }
                 TriggerAreas.Add(new RectangleHitbox(MenuPrefab.Position, MenuPrefab.Width, MenuPrefab.Height));
+                OnHitboxCreate?.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
                 AccessModifiersContextMenu = MenuPrefab;
                 OnFocused?.Invoke(this, new EventArgs());
             }
             else
             {
+                OnHitboxRemoval?.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
                 TriggerAreas.RemoveAt(1);
                 AccessModifiersContextMenu = null;
                 OnUnfocused?.Invoke(this, new EventArgs());
             }
         }
+
+        public void HandleMouse()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ShowOptionsMenu()
+        {
+            if (OptionsMenu == null)
+            {
+                if (AccessModifiersContextMenu != null)
+                {
+                    OnHitboxRemoval?.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                    TriggerAreas.RemoveAt(1);
+                    AccessModifiersContextMenu = null;
+                }
+                TriggerAreas.Add(new RectangleHitbox(OptionsPrefab.Position, OptionsPrefab.Width, OptionsPrefab.Height));
+                OnHitboxCreate?.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                OptionsMenu = OptionsPrefab;
+                OnFocused?.Invoke(this, new EventArgs());
+            }
+            else
+            {
+                OnHitboxRemoval?.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                TriggerAreas.RemoveAt(1);
+                OptionsMenu = null;
+                OnUnfocused?.Invoke(this, new EventArgs());
+            }
+        }
+
+        public void GenerateOptionsMenu()
+        {
+
+            OptionsPrefab = new ContextMenuNode("cnt", Vector.Zero, 0, 0, RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Make Normal", Vector.Zero, Renderer.GetTextWidth(11), Renderer.SingleTextHeight, () =>
+            {
+                Modifier = Modifiers.None;
+                OptionsMenu = null;
+                OnHitboxRemoval.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                TriggerAreas.RemoveAt(1);
+                GeneratePrefab();
+            },
+            RectangleRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Make Static", Vector.Zero, Renderer.GetTextWidth(11), Renderer.SingleTextHeight, () =>
+            {
+                Modifier = Modifiers.Static;
+                OptionsMenu = null;
+                OnHitboxRemoval.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                TriggerAreas.RemoveAt(1);
+                GeneratePrefab();
+            },
+            RectangleRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Make Abstract", Vector.Zero, Renderer.GetTextWidth(14), Renderer.SingleTextHeight, () =>
+            {
+                Modifier = Modifiers.Abstract;
+                OptionsMenu = null;
+                OnHitboxRemoval.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                TriggerAreas.RemoveAt(1);
+                GeneratePrefab();
+            },
+            RectangleRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode("btn1", "Remove", Vector.Zero, Renderer.GetTextWidth(6), Renderer.SingleTextHeight, () =>
+            {
+                OnRemoval?.Invoke(this, new FeatureRemovalEventArgs(this));
+                OptionsMenu = null;
+                OnHitboxRemoval.Invoke(this, new HitboxEventArgs(TriggerAreas[1]));
+                TriggerAreas.RemoveAt(1);
+            },
+            RectangleRenderElementStyle.Default));
+        }
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
         public EventHandler OnFocused { get; set; }
         public EventHandler OnUnfocused { get; set; }
+        public ContextMenuNode OptionsPrefab { get; set; }
+        public ContextMenuNode OptionsMenu { get; set; }
+        public bool isFocused { get; set; }
+
+        public EventHandler<HitboxEventArgs> OnHitboxCreate;
+        public EventHandler<HitboxEventArgs> OnHitboxRemoval;
+        public EventHandler<FeatureRemovalEventArgs> OnRemoval;
     }
 }
