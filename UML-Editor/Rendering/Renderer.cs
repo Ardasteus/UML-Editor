@@ -45,7 +45,7 @@ namespace UML_Editor.Rendering
 
         public void DrawRectangle(Vector position, int width, int height, Pen draw_pen, Brush fill_brush = null)
         {
-            Rectangle rect = new Rectangle(position.X + Origin.X, position.Y + Origin.Y, width, height);
+            Rectangle rect = new Rectangle((int)(position.X + Origin.X), (int)(position.Y + Origin.Y), width, height);
             using (Graphics g = GetGraphics())
             {
                 if (fill_brush != null)

@@ -24,30 +24,30 @@ namespace UML_Editor.Others
 
         public bool HasTriggered(Vector position)
         {
-            int left = Position.X;
-            int right = Position.X + Width;
-            int top = Position.Y;
-            int bot = Position.Y + Height;
+            float left = Position.X;
+            float right = Position.X + Width;
+            float top = Position.Y;
+            float bot = Position.Y + Height;
             return position.X <= right && position.X >= left && position.Y <= bot && position.Y >= top;
         }
 
         public Vector GetCenter()
         {
-            int left = Position.X;
-            int right = Position.X + Width;
-            int top = Position.Y;
-            int bot = Position.Y + Height;
+            float left = Position.X;
+            float right = Position.X + Width;
+            float top = Position.Y;
+            float bot = Position.Y + Height;
             return new Vector((left + right) / 2, (top + bot) / 2);
         }
         
         public Vector DeterminePosition(Vector middle_point)
         {
-            int left = Position.X;
-            int right = Position.X + Width;
-            int top = Position.Y;
-            int bot = Position.Y + Height;
-            int xCenter = (left + right) / 2;
-            int yCenter = (top + bot) / 2;
+            float left = Position.X;
+            float right = Position.X + Width;
+            float top = Position.Y;
+            float bot = Position.Y + Height;
+            float xCenter = (left + right) / 2;
+            float yCenter = (top + bot) / 2;
             Vector LeftAnchor = new Vector(left, yCenter);
             Vector RightAnchor = new Vector(right, yCenter);
             Vector TopAnchor = new Vector(xCenter, top);

@@ -287,19 +287,19 @@ namespace UML_Editor.Nodes
 
         public bool IsOnEdge(Vector v)
         {
-            int left = Position.X;
-            int right = Position.X + Width;
-            int top = Position.Y;
-            int bot = Position.Y + Height;
+            float left = Position.X;
+            float right = Position.X + Width;
+            float top = Position.Y;
+            float bot = Position.Y + Height;
             return v.X == left || v.X == right || v.Y == top || v.Y == bot;
         }
 
         public List<Vector> GetSideCenters()
         {
-            int left = Position.X;
-            int right = Position.X + Width;
-            int top = Position.Y;
-            int bot = Position.Y + Height;
+            float left = Position.X;
+            float right = Position.X + Width;
+            float top = Position.Y;
+            float bot = Position.Y + Height;
             List<Vector> centers = new List<Vector>();
             centers.Add(new Vector((left + right) / 2, top));
             centers.Add(new Vector(right, (top + bot) / 2));
@@ -313,6 +313,14 @@ namespace UML_Editor.Nodes
         public Vector GetLeftAnchor() => new Vector(Position.X, Position.Y + (Height / 2));
         public Vector GetRightAnchor() => new Vector(Position.X + Width, Position.Y + (Height / 2));
         public Vector GetCenter() => new Vector(Position.X + (Width / 2), Position.Y + (Height / 2));
+        public Vector GetTopLeftCorner() => new Vector(Position.X, Position.Y);
+        public Vector GetTopRightCorner() => new Vector(Position.X + Width, Position.Y);
+        public Vector GetBotLeftCorner() => new Vector(Position.X, Position.Y + Height);
+        public Vector GetBotRightCorner() => new Vector(Position.X + Width, Position.Y + Height);
+        public Line GetTopSide() => new Line(GetTopLeftCorner(), GetTopRightCorner());
+        public Line GetBotSide() => new Line(GetBotLeftCorner(), GetBotRightCorner());
+        public Line GetLeftSide() => new Line(GetTopLeftCorner(), GetBotLeftCorner());
+        public Line GetRightSide() => new Line(GetTopRightCorner(), GetBotRightCorner());
 
         private void OnHitboxCreation(object sender, HitboxEventArgs e)
         {

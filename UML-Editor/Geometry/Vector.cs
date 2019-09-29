@@ -9,10 +9,10 @@ namespace UML_Editor.Geometry
 {
     public struct Vector
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
 
-        public Vector(int x, int y)
+        public Vector(float x, float y)
         {
             X = x;
             Y = y;
@@ -47,7 +47,7 @@ namespace UML_Editor.Geometry
 
         public static implicit operator Point(Vector v)
         {
-            return new Point(v.X, v.Y);
+            return new Point((int)v.X, (int)v.Y);
         }
         public static implicit operator Vector(Point p)
         {
@@ -60,7 +60,7 @@ namespace UML_Editor.Geometry
         }
         public static implicit operator Vector(PointF p)
         {
-            return new Vector((int)p.X, (int)p.Y);
+            return new Vector(p.X, p.Y);
         }
         public static Vector operator +(Vector left, int right)
         {

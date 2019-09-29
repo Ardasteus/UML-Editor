@@ -163,7 +163,7 @@ namespace UML_Editor
                 temp = OptionsMenu;
             else
                 temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            if (IsCreatingRelationship && temp != null)
+            if (IsCreatingRelationship && temp != null && temp is UMLDiagram)
             {
                 if (RelationshipOrigin == null)
                     RelationshipOrigin = (ClassDiagramNode)temp;
