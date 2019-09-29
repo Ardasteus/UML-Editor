@@ -177,12 +177,8 @@ namespace UML_Editor
             {
                 if (OptionsMenu != null)
                     OptionsMenu = null;
-                if (CurrentFocus != null)
-                {
-                    CurrentFocus.Unfocus();
-                    CurrentFocus = null;
-                }
-                CurrentFocus = (ClassDiagramNode)temp;
+                if (temp is ClassDiagramNode)
+                    CurrentFocus = (ClassDiagramNode)temp;
                 IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
                 if (node != null)
                 {
@@ -212,6 +208,11 @@ namespace UML_Editor
 
                     node.isFocused = true;
                     node.HandleMouse();
+                    if (CurrentFocus != null)
+                    {
+                        CurrentFocus.Unfocus();
+                        CurrentFocus = null;
+                    }
                 }
                 else
                 {
@@ -219,6 +220,11 @@ namespace UML_Editor
                     {
                         FocusedKeyboardNode.isFocused = false;
                         FocusedKeyboardNode = null;
+                    }
+                    if (CurrentFocus != null)
+                    {
+                        CurrentFocus.Unfocus();
+                        CurrentFocus = null;
                     }
                 }
             }
@@ -228,6 +234,11 @@ namespace UML_Editor
             INode temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             if (OptionsMenu != null)
                 OptionsMenu = null;
+            if (FocusedKeyboardNode != null)
+            {
+                FocusedKeyboardNode.isFocused = false;
+                FocusedKeyboardNode = null;
+            }
             if (temp == null)
             {
                 if (CurrentFocus != null)

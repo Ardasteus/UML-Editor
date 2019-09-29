@@ -307,6 +307,12 @@ namespace UML_Editor.Nodes
             return centers;
         }
 
+        public Vector GetTopAnchor() => new Vector((Position.X + (Width / 2)), Position.Y);
+        public Vector GetBotAnchor() => new Vector((Position.X + (Width / 2)), Position.Y + Height);
+        public Vector GetLeftAnchor() => new Vector(Position.X, Position.Y + (Height / 2));
+        public Vector GetRightAnchor() => new Vector(Position.X + Width, Position.Y + (Height / 2));
+        public Vector GetCenter() => new Vector(Position.X + (Width / 2), Position.Y + (Height / 2));
+
         private void OnHitboxCreation(object sender, HitboxEventArgs e)
         {
             TriggerAreas.Add(e.Hitbox);

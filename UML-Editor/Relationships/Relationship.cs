@@ -24,7 +24,7 @@ namespace UML_Editor.Relationships
             OriginNode = origin;
             TargetNode = target;
             List<Vector> vectors = GetLineVectors();
-            Centerline = new LineRenderElement(vectors[0], vectors[1], 1, Color.Black);
+            Centerline = new LineRenderElement(origin.GetCenter(), target.GetCenter(), 1, Color.Black);
             OriginNode.OnPositionChanged += OnPositionChanged;
             TargetNode.OnPositionChanged += OnPositionChanged;
         }
@@ -38,7 +38,7 @@ namespace UML_Editor.Relationships
         private void OnPositionChanged(object sender, PositionEventArgs e)
         {
             List<Vector> vectors = GetLineVectors();
-            Centerline = new LineRenderElement(vectors[0], vectors[1], 1, Color.Black);
+            Centerline = new LineRenderElement(OriginNode.GetCenter(), TargetNode.GetCenter(), 1, Color.Black);
         }
 
         private List<Vector> GetLineVectors()
