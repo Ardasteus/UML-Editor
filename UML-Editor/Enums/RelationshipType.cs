@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UML_Editor.Enums
 {
-    class RelationshipType
+    public enum RelationshipType
     {
     }
 }

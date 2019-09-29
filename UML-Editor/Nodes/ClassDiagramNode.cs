@@ -46,6 +46,7 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Height = value;
                 ((RectangleHitbox)TriggerAreas[0]).Height = value;
+                OnResize?.Invoke(this, new ResizeEventArgs(Height));
             }
         }
         public List<PropertyNode> Properties = new List<PropertyNode>();

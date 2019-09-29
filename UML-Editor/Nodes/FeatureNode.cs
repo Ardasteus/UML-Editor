@@ -20,6 +20,7 @@ namespace UML_Editor.Nodes
         public TextBoxNode TypeTextBox { get; set; }
         public TextBoxNode NameTextBox { get; set; }
         public RectangleRenderElement BorderElement { get; set; }
+        public LabelNode Separator { get; set; }
         public FeatureNode(string name, AccessModifiers accessModifier, Modifiers modifier)
         {
             Name = name;

@@ -11,7 +11,7 @@ namespace UML_Editor.Others
     {
         public RectangleHitbox(Vector position, int width, int height)
         {
-            Position = position;
+            Position = new Vector(position.X, position.Y);
             Width = width;
             Height = height;
         }
@@ -29,6 +29,15 @@ namespace UML_Editor.Others
             int bot = Position.Y + Height;
             return position.X <= right && position.X >= left && position.Y <= bot && position.Y >= top;
         }
+
+        public Vector GetCenter()
+        {
+            int left = Position.X;
+            int right = Position.X + Width;
+            int top = Position.Y;
+            int bot = Position.Y + Height;
+            return new Vector((left + right) / 2, (top + bot) / 2);
+        }
         
         public Vector DeterminePosition(Vector middle_point)
         {
@@ -36,37 +45,44 @@ namespace UML_Editor.Others
             int right = Position.X + Width;
             int top = Position.Y;
             int bot = Position.Y + Height;
-            if (middle_point.Y <= bot && middle_point.Y >= top)
+            int xCenter = (left + right) / 2;
+            int yCenter = (top + bot) / 2;
+            Vector LeftAnchor = new Vector(left, yCenter);
+            Vector RightAnchor = new Vector(right, yCenter);
+            Vector TopAnchor = new Vector(xCenter, top);
+            Vector BotAnchor = new Vector(xCenter, bot);
+            Vector center = (new Vector((right + left) / 2, (top + bot) / 2) + middle_point) / 2;
+            if (center.Y <= bot && center.Y >= top)
             {
-                if (middle_point.X > left && middle_point.X > right)
-                    return new Vector(right, middle_point.Y);
+                if (center.X > left && center.X > right)
+                    return new Vector(right, center.Y);
                 else
-                    return new Vector(left, middle_point.Y);
+                    return new Vector(left, center.Y);
             }
-            else if (middle_point.X <= right && middle_point.X >= left)
+            else if (center.X <= right && center.X >= left)
             {
-                if (middle_point.Y > top && middle_point.Y > bot)
-                    return new Vector(middle_point.X, bot);
+                if (center.Y > top && center.Y > bot)
+                    return new Vector(center.X, bot);
                 else
-                    return new Vector(middle_point.X, top);
+                    return new Vector(center.X, top);
             }
             else
             {
-                if (middle_point.X < left && middle_point.Y < bot)
+                if (middle_point.X < left && middle_point.Y < top)
                 {
-                    return new Vector(left, (bot + top) / 2);
+                    return LeftAnchor;
                 }
-                else if (middle_point.X > right && middle_point.Y < bot)
+                else if (middle_point.X > right && middle_point.Y > bot)
                 {
-                    return new Vector(right, (bot + top) / 2);
+                    return RightAnchor;
                 }
-                else if (middle_point.X < left && middle_point.Y < bot)
+                else if (middle_point.X > right && middle_point.Y < top)
                 {
-                    return new Vector((right + left) / 2, top);
+                    return TopAnchor;
                 }
                 else
                 {
-                    return new Vector((right + left) / 2, bot);
+                    return BotAnchor;
                 }
             }
         }

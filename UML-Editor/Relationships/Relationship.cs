@@ -16,26 +16,23 @@ namespace UML_Editor.Relationships
         public Vector Position { get; set; }
         public RelationshipSegment Origin { get; set; }
         public RelationshipSegment Target { get; set; }
+        public LineRenderElement Centerline { get; set; }
         public Relationship(ClassDiagramNode origin, ClassDiagramNode target)
         {
             Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
             Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
             Position = (originPos + targetPos) / 2;
-            Vector JointOrigin = ((RectangleHitbox)origin.TriggerAreas[0]).DeterminePosition(Position);
-            Vector JointTarget = ((RectangleHitbox)target.TriggerAreas[0]).DeterminePosition(Position);
-            Position.X = JointOrigin.X;
-            Position.Y = JointTarget.Y;
-            if (origin.IsOnEdge(Position) || target.IsOnEdge(Position))
-            {
-                Position.X = JointTarget.X;
-                Position.Y = JointOrigin.Y;
-            }
+            RectangleHitbox originHit = ((RectangleHitbox)origin.TriggerAreas[0]);
+            RectangleHitbox targetHit = ((RectangleHitbox)target.TriggerAreas[0]);
+            Vector JointOrigin = originHit.DeterminePosition(targetPos);
+            Vector JointTarget = targetHit.DeterminePosition(originPos);
 
             Origin = new RelationshipSegment(Position, JointOrigin, origin);
             Target = new RelationshipSegment(Position, JointTarget, target);
             Origin.OnAnchorRequest += SetAnchor;
             Target.OnAnchorRequest += SetAnchor;
             Target.SetRelationshipType();
+            Centerline = new LineRenderElement(JointOrigin, JointTarget, 1, Color.Black);
         }
         public void ChangeOrigin(ClassDiagramNode classDiagram)
         {
@@ -49,6 +46,7 @@ namespace UML_Editor.Relationships
         {
             Target.Render(renderer);
             Origin.Render(renderer);
+            Centerline.Render(renderer);
         }
         
         private void SetAnchor(object sender, EventArgs e)
@@ -58,20 +56,15 @@ namespace UML_Editor.Relationships
             Vector originPos = origin.Position + new Vector(origin.Width / 2, origin.Height / 2);
             Vector targetPos = target.Position + new Vector(target.Width / 2, target.Height / 2);
             Position = (originPos + targetPos) / 2;
-            Vector JointOrigin = ((RectangleHitbox)origin.TriggerAreas[0]).DeterminePosition(Position);
-            Vector JointTarget = ((RectangleHitbox)target.TriggerAreas[0]).DeterminePosition(Position);
-            Position.X = JointOrigin.X;
-            Position.Y = JointTarget.Y;
-            if (origin.IsOnEdge(Position) || target.IsOnEdge(Position))
-            {
-                Position.X = JointTarget.X;
-                Position.Y = JointOrigin.Y;
-            }
-
+            RectangleHitbox originHit = (RectangleHitbox)origin.TriggerAreas[0];
+            RectangleHitbox targetHit = (RectangleHitbox)target.TriggerAreas[0];
+            Vector JointOrigin = originHit.DeterminePosition(targetPos);
+            Vector JointTarget = targetHit.DeterminePosition(originPos);
             Origin.Position = Position;
             Origin.AnchorPosition = JointOrigin;
             Target.Position = Position;
             Target.AnchorPosition = JointTarget;
+            Centerline = new LineRenderElement(JointOrigin, JointTarget, 1, Color.Black);
         }
     }
 }

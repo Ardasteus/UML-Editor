@@ -13,6 +13,15 @@ namespace UML_Editor.Nodes
     public class LabelNode : IRenderableNode
     {
         public string Name { get; set; }
+        public string Text
+        {
+            get => TextElement.Text;
+            set
+            {
+                TextElement.Text = value;
+                Width = Renderer.GetTextWidth(Text.Length);
+            }
+        }
         public Vector Position
         {
             get => BorderElement.Position;
@@ -20,7 +29,6 @@ namespace UML_Editor.Nodes
             {
                 BorderElement.Position = value;
                 TextElement.Position = value;
-                ((RectangleHitbox)TriggerAreas[0]).Position = value;
             }
         }
         public int Width
@@ -79,7 +87,7 @@ namespace UML_Editor.Nodes
         public LabelNode(string name, string text, Vector position)
         {
             Name = name;
-            BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(text.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
+            BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(text.Length), Renderer.SingleTextHeight, Color.White, Color.White);
             TextElement = new TextRenderElement(position, text, Color.Black);
             TextSize = 12;
         }

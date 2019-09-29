@@ -38,6 +38,7 @@ namespace UML_Editor.Relationships
             TargetNode = classDiagram;
             LineElement = new LineRenderElement(position, anchor, 1, Color.Black);
             TargetNode.OnPositionChanged += OnNodePositionChanged;
+            TargetNode.OnResize += OnNodeResize;
         }
 
         public void Render(Renderer renderer)
@@ -45,6 +46,11 @@ namespace UML_Editor.Relationships
             LineElement.Render(renderer);
         }
         private void OnNodePositionChanged(object sender, PositionEventArgs e)
+        {
+            OnAnchorRequest?.Invoke(this, new EventArgs());
+        }
+
+        private void OnNodeResize(object sender, ResizeEventArgs e)
         {
             OnAnchorRequest?.Invoke(this, new EventArgs());
         }

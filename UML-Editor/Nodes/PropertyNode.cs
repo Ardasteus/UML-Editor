@@ -29,7 +29,8 @@ namespace UML_Editor.Nodes
         {
             AccessModifierButton = new ButtonNode("accs_btn", GetModifierChar(), position, Renderer.SingleTextWidth, Renderer.SingleTextHeight, ShowMenu, new RectangleRenderElementStyle(Color.White, Color.White, 1));
             NameTextBox = new TextBoxNode("type_txt", prop_name, position + new Vector(Renderer.SingleTextWidth, 0), Renderer.GetTextWidth(prop_name.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
-            TypeTextBox = new TextBoxNode("type_txt", type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width, 0), Renderer.GetTextWidth(type.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
+            Separator = new LabelNode("separator", ":", position + new Vector(NameTextBox.Width + AccessModifierButton.Width, 0));
+            TypeTextBox = new TextBoxNode("type_txt", type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width + Separator.Width, 0), Renderer.GetTextWidth(type.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
             BorderElement = new RectangleRenderElement(position, GetWidth(), Renderer.SingleTextHeight, Color.White, Color.Black);
             TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
             NameTextBox.OnResize = Resize;
@@ -46,7 +47,8 @@ namespace UML_Editor.Nodes
                 ((RectangleHitbox)TriggerAreas[0]).Position = value;
                 AccessModifierButton.Position = Position;
                 NameTextBox.Position = new Vector(Position.X + AccessModifierButton.Width, Position.Y);
-                TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
+                Separator.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
+                TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width + Separator.Width, Position.Y);
                 GeneratePrefab();
             }
         }
@@ -72,14 +74,15 @@ namespace UML_Editor.Nodes
 
         public override int GetWidth()
         {
-            return AccessModifierButton.Width + NameTextBox.Width + TypeTextBox.Width;
+            return AccessModifierButton.Width + NameTextBox.Width + TypeTextBox.Width + Separator.Width;
         }
 
         private void Resize(object sender, ResizeEventArgs args)
         {
             Width = GetWidth();
             NameTextBox.Position = new Vector(Position.X + AccessModifierButton.Width, Position.Y);
-            TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
+            Separator.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
+            TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width + Separator.Width, Position.Y);
         }
 
         public override List<INode> GetChildren()
@@ -90,6 +93,7 @@ namespace UML_Editor.Nodes
             ret.Add(AccessModifierButton);
             ret.Add(TypeTextBox);
             ret.Add(NameTextBox);
+            ret.Add(Separator);
             return ret;
         }
 
@@ -99,6 +103,7 @@ namespace UML_Editor.Nodes
             AccessModifierButton.Render(renderer);
             NameTextBox.Render(renderer);
             TypeTextBox.Render(renderer);
+            Separator.Render(renderer);
             if (AccessModifiersContextMenu != null)
                 AccessModifiersContextMenu.Render(renderer);
         }

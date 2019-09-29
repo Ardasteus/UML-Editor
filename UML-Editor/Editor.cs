@@ -37,12 +37,12 @@ namespace UML_Editor
             renderTarget.MouseDown += OnMouseDown;
             renderTarget.MouseUp += OnMouseUp;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddNode(new ClassDiagramNode(Vector.Zero, "Class", Modifiers.None, AccessModifiers.Public));
+            AddNode(new ClassDiagramNode(new Vector(-100, -100), "Class", Modifiers.None, AccessModifiers.Public));
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            AddNode(new ClassDiagramNode(Vector.Zero, "Class", Modifiers.None, AccessModifiers.Public));
+            AddNode(new ClassDiagramNode(new Vector(100,100), "Class", Modifiers.None, AccessModifiers.Public));
             ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[1]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
@@ -127,7 +127,7 @@ namespace UML_Editor
             if(Dragged != null)
             {
                 Dragged = null;
-                DraggingVector = null;
+                DraggingVector = Vector.Zero;
             }
         }
         public void OnMouseClick(object sender, MouseEventArgs e)

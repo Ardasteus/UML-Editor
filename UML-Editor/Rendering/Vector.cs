@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace UML_Editor.Rendering
 {
-    public class Vector
+    public struct Vector
     {
         public int X { get; set; }
         public int Y { get; set; }
