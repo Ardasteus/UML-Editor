@@ -155,7 +155,6 @@ namespace UML_Editor.Nodes
 
         public void HandleMouse()
         {
-            throw new NotImplementedException();
         }
 
         public void ShowOptionsMenu()

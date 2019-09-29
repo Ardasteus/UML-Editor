@@ -175,6 +175,14 @@ namespace UML_Editor
             }
             else
             {
+                if (OptionsMenu != null)
+                    OptionsMenu = null;
+                if (CurrentFocus != null)
+                {
+                    CurrentFocus.Unfocus();
+                    CurrentFocus = null;
+                }
+                CurrentFocus = (ClassDiagramNode)temp;
                 IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
                 if (node != null)
                 {
@@ -218,8 +226,15 @@ namespace UML_Editor
         private void HandleRightClick(Vector mouse_position)
         {
             INode temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            if(temp == null)
+            if (OptionsMenu != null)
+                OptionsMenu = null;
+            if (temp == null)
             {
+                if (CurrentFocus != null)
+                {
+                    CurrentFocus.Unfocus();
+                    CurrentFocus = null;
+                }
                 if (OptionsMenu == null)
                 {
                     GeneratePrefab(mouse_position);
@@ -232,6 +247,7 @@ namespace UML_Editor
             }
             else if(temp is IOptionsNode)
             {
+                CurrentFocus = (ClassDiagramNode)temp;
                 IOptionsNode op = SearchForOptionsNode(temp, mouse_position);
                 op.OptionsPrefab.Position = mouse_position;
                 op.ShowOptionsMenu();

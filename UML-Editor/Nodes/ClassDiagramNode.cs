@@ -320,5 +320,12 @@ namespace UML_Editor.Nodes
         {
             RemoveFeature(e.FeatureNode);
         }
+
+        public void Unfocus()
+        {
+            if (OptionsMenu != null)
+                OptionsMenu = null;
+            FocusedFeature?.OnUnfocused(this, new EventArgs());
+        }
     }
 }
