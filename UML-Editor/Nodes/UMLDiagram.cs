@@ -13,7 +13,7 @@ namespace UML_Editor.Nodes
 {
     public abstract class UMLDiagram : IRenderableNode, IContainerNode
     {
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
         public abstract Vector Position { get; set; }
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }

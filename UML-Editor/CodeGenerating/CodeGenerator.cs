@@ -58,14 +58,14 @@ namespace UML_Editor.CodeGenerating
         {
             CodeMemberProperty newProperty = new CodeMemberProperty();
             newProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            newProperty.Name = propertyNode.PropertyName;
+            newProperty.Name = propertyNode.Name;
             newProperty.HasGet = true;
             newProperty.HasSet = true;
-            newProperty.Type = new CodeTypeReference(propertyNode.PropertyType);
+            newProperty.Type = new CodeTypeReference(propertyNode.Type);
             CodeMemberField field = new CodeMemberField()
             {
-                Name = propertyNode.PropertyName.ToLower(),
-                Type = new CodeTypeReference(propertyNode.PropertyType),
+                Name = propertyNode.Name.ToLower(),
+                Type = new CodeTypeReference(propertyNode.Type),
                 Attributes = MemberAttributes.Private
             };
             newProperty.GetStatements.Add(new CodeMethodReturnStatement(

@@ -10,14 +10,25 @@ using System.Drawing;
 using UML_Editor.Others;
 using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Geometry;
+using UML_Editor.ProjectStructure;
 
 namespace UML_Editor.Nodes
 {
     public class ClassDiagramNode : UMLDiagram, IOptionsNode
     {
+        public ClassStructure Structure;
         private FeatureNode FocusedFeature;
         private LineRenderElement NameLine;
         private LineRenderElement SeparatorLine;
+        public override string Name
+        {
+            get => NameTextBox.Text;
+            set
+            {
+                NameTextBox.Text = value;
+                Structure.Name = value;
+            }
+        }
         public override Vector Position
         {
             get => BorderElement.Position;
@@ -58,11 +69,12 @@ namespace UML_Editor.Nodes
         public bool isFocused { get; set; }
         public EventHandler<PositionEventArgs> OnPositionChanged { get; set; }
 
-        public ClassDiagramNode(Vector position, string Name, Modifiers modifier, AccessModifiers accessModifiers)
+        public ClassDiagramNode(Vector position, ClassStructure structure)
         {
-            BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(Name.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
-            TriggerAreas.Add(new RectangleHitbox(position, Renderer.GetTextWidth(Name.Length), Renderer.SingleTextHeight));
-            NameTextBox = new TextBoxNode("diagram_name", Name, Position, Width, Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
+            Structure = structure;
+            BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
+            TriggerAreas.Add(new RectangleHitbox(position, Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight));
+            NameTextBox = new TextBoxNode("diagram_name", structure.Name, Position, Width, Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
             NameTextBox.OnResize = NameResize;
             NameLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             SeparatorLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
@@ -71,7 +83,7 @@ namespace UML_Editor.Nodes
 
         public void AddProperty(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
         {
-            PropertyNode new_prop = new PropertyNode("prop", Position + new Vector(0, (Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
+            PropertyNode new_prop = new PropertyNode(Position + new Vector(0, (Properties.Count + 1) * Renderer.SingleTextHeight), new PropertyStructure(name, type, accessModifier, modifier));
             new_prop.OnResize = Resize;
             new_prop.OnFocused = OnFeatureFocused;
             new_prop.OnUnfocused = OnFeatureUnfocused;
@@ -84,7 +96,7 @@ namespace UML_Editor.Nodes
         }
         public void AddMethod(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
         {
-            MethodNode new_method = new MethodNode("prop", Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), type, name, accessModifier, modifier);
+            MethodNode new_method = new MethodNode(Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), new MethodStructure(name, type, accessModifier, modifier));
             new_method.OnResize = Resize;
             new_method.OnFocused = OnFeatureFocused;
             new_method.OnUnfocused = OnFeatureUnfocused;

@@ -22,21 +22,15 @@ namespace UML_Editor.Nodes
         public TextBoxNode NameTextBox { get; set; }
         public RectangleRenderElement BorderElement { get; set; }
         public LabelNode Separator { get; set; }
-        public FeatureNode(string name, AccessModifiers accessModifier, Modifiers modifier)
-        {
-            Name = name;
-            AccessModifier = accessModifier;
-            Modifier = modifier;
-            GenerateOptionsMenu();
-        }
 
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
+        public virtual string Type { get; set; }
         public abstract Vector Position { get; set; }
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         private AccessModifiers accessmodifier;
-        public AccessModifiers AccessModifier
+        public virtual AccessModifiers AccessModifier
         {
             get => accessmodifier;
             set
@@ -47,7 +41,7 @@ namespace UML_Editor.Nodes
             }
         }
         private Modifiers modifier;
-        public Modifiers Modifier
+        public virtual Modifiers Modifier
         {
             get => modifier;
             set

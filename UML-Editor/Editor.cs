@@ -13,13 +13,15 @@ using UML_Editor.Others;
 using UML_Editor.Relationships;
 using UML_Editor.CodeGenerating;
 using UML_Editor.Geometry;
+using UML_Editor.ProjectStructure;
 
 namespace UML_Editor
 {
     public class Editor
     {
+        public Project CurrentProject;
         private Renderer Renderer;
-        private List<INode> Nodes = new List<INode>();
+        private List<INode> Diagrams = new List<INode>();
         private IKeyboardHandlerNode FocusedKeyboardNode;
         private ContextMenuNode OptionsPrefab;
         private ContextMenuNode OptionsMenu;
@@ -38,22 +40,17 @@ namespace UML_Editor
             renderTarget.MouseDown += OnMouseDown;
             renderTarget.MouseUp += OnMouseUp;
             //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddDiagram(new ClassDiagramNode(new Vector(-100, -100), "Class", Modifiers.None, AccessModifiers.Public));
-            ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Nodes[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Nodes[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            AddDiagram(new ClassDiagramNode(new Vector(100, 100), "Class", Modifiers.None, AccessModifiers.Public));
-            ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Nodes[1]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Nodes[1]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Nodes[1]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            AddDiagram(new ClassDiagramNode(new Vector(-100, -100), new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None)));
+            ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             //InitializeRedrawTimer();
         }
         public void Render()
         {
             Clear();
-            Nodes.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(Renderer));
+            Diagrams.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(Renderer));
             OptionsMenu?.Render(Renderer);
             RelationshipManager.Render(Renderer);
             Renderer.Render();
@@ -66,7 +63,7 @@ namespace UML_Editor
 
         public void AddDiagram(UMLDiagram node)
         {
-            Nodes.Add(node);
+            Diagrams.Add(node);
             node.OnRemoval += OnDiagramRemoval;
         }
 
@@ -76,7 +73,7 @@ namespace UML_Editor
         }
         public void RemoveDiagram(UMLDiagram diagram)
         {
-            Nodes.Remove(diagram);
+            Diagrams.Remove(diagram);
             diagram = null;
         }
 
@@ -124,7 +121,7 @@ namespace UML_Editor
             Vector mouse_position = e.Location - Renderer.Origin;
             if (e.Button == MouseButtons.Left)
             {
-                Dragged = ((ClassDiagramNode)Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x)));
+                Dragged = ((ClassDiagramNode)Diagrams.FirstOrDefault(x => CheckIfClicked(mouse_position, x)));
                 if (Dragged != null)
                     DraggingVector = Dragged.Position - mouse_position;
                 else
@@ -165,7 +162,7 @@ namespace UML_Editor
             else if (RelationshipManager.Relationships.Count > 0 && RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x)) != null)
                 temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             else
-                temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+                temp = Diagrams.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             if (IsCreatingRelationship && temp != null && temp is UMLDiagram)
             {
                 if (RelationshipOrigin == null)
@@ -212,7 +209,7 @@ namespace UML_Editor
 
                     node.isFocused = true;
                     node.HandleMouse();
-                    if (CurrentFocusedDiagram != null)
+                    if (CurrentFocusedDiagram != null && CurrentFocusedDiagram != temp)
                     {
                         CurrentFocusedDiagram.Unfocus();
                         CurrentFocusedDiagram = null;
@@ -235,7 +232,7 @@ namespace UML_Editor
         }
         private void HandleRightClick(Vector mouse_position)
         {
-            INode temp = Nodes.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            INode temp = Diagrams.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             if (OptionsMenu != null)
                 OptionsMenu = null;
             if (FocusedKeyboardNode != null)
@@ -374,7 +371,7 @@ namespace UML_Editor
             OptionsPrefab = new ContextMenuNode("cnt", mouse_positon, 0, 0, RectangleRenderElementStyle.Default);
             OptionsPrefab.AddNode(new ButtonNode("btn1", "Add a Diagram", mouse_positon, Renderer.GetTextWidth(13), Renderer.SingleTextHeight, () =>
             {
-                Nodes.Add(new ClassDiagramNode(mouse_positon, "New Class", Modifiers.None, AccessModifiers.Protected));
+                AddDiagram(new ClassDiagramNode(new Vector(-100, -100), new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None)));
                 OptionsMenu = null;
             },
             RectangleRenderElementStyle.Default));
@@ -394,7 +391,7 @@ namespace UML_Editor
 
         private void GenerateCode()
         {
-            foreach (ClassDiagramNode classNode in Nodes.OfType<ClassDiagramNode>())
+            foreach (ClassDiagramNode classNode in Diagrams.OfType<ClassDiagramNode>())
             {
                 CodeGenerator generator = new CodeGenerator("D:\\Testing\\" + classNode.NameTextBox.Text + ".cs", classNode);
                 generator.GenerateClass();
