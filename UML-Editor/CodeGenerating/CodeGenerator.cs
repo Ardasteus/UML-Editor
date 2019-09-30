@@ -9,6 +9,7 @@ using System.Reflection;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
+using UML_Editor.ProjectStructure;
 
 namespace UML_Editor.CodeGenerating
 {
@@ -17,8 +18,8 @@ namespace UML_Editor.CodeGenerating
         public string Output { get; set; }
         CodeCompileUnit TargetUnit;
         CodeTypeDeclaration TargetClass;
-        ClassDiagramNode ClassNode;
-        public CodeGenerator(string output, ClassDiagramNode class_node)
+        Project Project;
+        public CodeGenerator(string output, Project project)
         {
             Output = output;
             TargetUnit = new CodeCompileUnit();

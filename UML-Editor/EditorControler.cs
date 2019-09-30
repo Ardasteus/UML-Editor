@@ -40,6 +40,7 @@ namespace UML_Editor
             Plane.MouseMove += CurrentEditor.OnMouseMove;
             Plane.MouseDown += CurrentEditor.OnMouseDown;
             Plane.MouseUp += CurrentEditor.OnMouseUp;
+            Plane.MouseWheel += CurrentEditor.OnMouseWheel;
             CurrentEditor.Render();
             Render();
         }
@@ -70,11 +71,13 @@ namespace UML_Editor
                 Plane.MouseMove -= CurrentEditor.OnMouseMove;
                 Plane.MouseDown -= CurrentEditor.OnMouseDown;
                 Plane.MouseUp -= CurrentEditor.OnMouseUp;
+                Plane.MouseWheel -= CurrentEditor.OnMouseWheel;
                 CurrentEditor = Editors[i];
                 Plane.MouseClick += CurrentEditor.OnMouseClick;
                 Plane.MouseMove += CurrentEditor.OnMouseMove;
                 Plane.MouseDown += CurrentEditor.OnMouseDown;
                 Plane.MouseUp += CurrentEditor.OnMouseUp;
+                Plane.MouseWheel += CurrentEditor.OnMouseWheel;
                 CurrentEditor.isFocused = true;
                 CurrentEditor.Render();
             }

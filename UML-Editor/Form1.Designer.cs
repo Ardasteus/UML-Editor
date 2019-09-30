@@ -36,9 +36,10 @@
             // 
             // Plane
             // 
-            this.Plane.Location = new System.Drawing.Point(0, 56);
+            this.Plane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Plane.Location = new System.Drawing.Point(0, 0);
             this.Plane.Name = "Plane";
-            this.Plane.Size = new System.Drawing.Size(800, 394);
+            this.Plane.Size = new System.Drawing.Size(800, 450);
             this.Plane.TabIndex = 0;
             this.Plane.TabStop = false;
             // 
@@ -47,7 +48,7 @@
             this.ControlerTab.Dock = System.Windows.Forms.DockStyle.Top;
             this.ControlerTab.Location = new System.Drawing.Point(0, 0);
             this.ControlerTab.Name = "ControlerTab";
-            this.ControlerTab.Size = new System.Drawing.Size(800, 50);
+            this.ControlerTab.Size = new System.Drawing.Size(800, 25);
             this.ControlerTab.TabIndex = 1;
             this.ControlerTab.TabStop = false;
             // 

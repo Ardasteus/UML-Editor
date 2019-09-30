@@ -65,7 +65,7 @@ namespace UML_Editor.Relationships
             Origin.Midpoint = vectors[2];
 
             Target.Position = vectors[1];
-            Target.Joint = vectors[4];
+            Target.Joint = vectors[4];      
             Target.Midpoint = vectors[2];
             StealHitboxes();
         }

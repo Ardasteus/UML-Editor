@@ -37,7 +37,7 @@ namespace UML_Editor
         {
             Project = new Project(ProjectName);
             Renderer = new Renderer(renderTarget);
-            AddDiagram(new Vector(-100, -100), new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None));
+            AddDiagram(Vector.Zero, new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None));
             ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
@@ -103,7 +103,7 @@ namespace UML_Editor
 
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
-            Vector mouse_position = e.Location - Renderer.Origin;
+            Vector mouse_position = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
             if (e.Button == MouseButtons.Left)
             {
                 if (Dragged != null)
@@ -118,7 +118,7 @@ namespace UML_Editor
         }
         public void OnMouseDown(object sender, MouseEventArgs e)
         {
-            Vector mouse_position = e.Location - Renderer.Origin;
+            Vector mouse_position = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
             if (e.Button == MouseButtons.Left)
             {
                 Dragged = ((ClassDiagramNode)Diagrams.FirstOrDefault(x => CheckIfClicked(mouse_position, x)));
@@ -141,8 +141,8 @@ namespace UML_Editor
         }
         public void OnMouseClick(object sender, MouseEventArgs e)
         {
-            Vector mouse_position = e.Location - Renderer.Origin;
-            if(e.Button == MouseButtons.Left)
+            Vector mouse_position = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
+            if (e.Button == MouseButtons.Left)
             {
                 HandleLeftClick(mouse_position);
             }
@@ -400,6 +400,20 @@ namespace UML_Editor
 
         public void OnMouseWheel(object sender, MouseEventArgs e)
         {
+            float PreviousScale = Renderer.Scale;
+            if(e.Delta > 0)
+                Renderer.Scale *= 1.1f;
+            else
+                Renderer.Scale *= 0.9f;
+
+            Vector PreScale = (Vector)e.Location / PreviousScale - Renderer.Origin;
+            Vector AfterScale = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
+
+            Vector Subtracted = PreScale - AfterScale;
+
+            Renderer.Origin = Renderer.Origin - Subtracted;
+
+            Render();
         }
         public void OnFormResize(object sender, EventArgs e)
         {
