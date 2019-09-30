@@ -29,26 +29,39 @@
         private void InitializeComponent()
         {
             this.Plane = new System.Windows.Forms.PictureBox();
+            this.ControlerTab = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.Plane)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ControlerTab)).BeginInit();
             this.SuspendLayout();
             // 
             // Plane
             // 
-            this.Plane.Location = new System.Drawing.Point(13, 13);
+            this.Plane.Location = new System.Drawing.Point(0, 56);
             this.Plane.Name = "Plane";
-            this.Plane.Size = new System.Drawing.Size(775, 425);
+            this.Plane.Size = new System.Drawing.Size(800, 394);
             this.Plane.TabIndex = 0;
             this.Plane.TabStop = false;
+            // 
+            // ControlerTab
+            // 
+            this.ControlerTab.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ControlerTab.Location = new System.Drawing.Point(0, 0);
+            this.ControlerTab.Name = "ControlerTab";
+            this.ControlerTab.Size = new System.Drawing.Size(800, 50);
+            this.ControlerTab.TabIndex = 1;
+            this.ControlerTab.TabStop = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.ControlerTab);
             this.Controls.Add(this.Plane);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.Plane)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ControlerTab)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -56,6 +69,7 @@
         #endregion
 
         private System.Windows.Forms.PictureBox Plane;
+        private System.Windows.Forms.PictureBox ControlerTab;
     }
 }
 

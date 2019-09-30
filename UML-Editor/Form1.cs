@@ -17,17 +17,12 @@ namespace UML_Editor
 {
     public partial class Form1 : Form
     {
-        Editor editor;
         public Form1()
         {
             InitializeComponent();
             Plane.Image = new Bitmap(Plane.Width, Plane.Height);
-            editor = new Editor(Plane);
-            this.KeyPress += editor.OnKeyPress;
-            this.KeyDown += editor.OnKeyDown;
-            this.KeyUp += editor.OnKeyUp;
-            this.MouseWheel += editor.OnMouseWheel;
-            editor.Render();
+            ControlerTab.Image = new Bitmap(ControlerTab.Width, ControlerTab.Height);
+            EditorControler app = new EditorControler(ControlerTab, Plane);
         }
     }
 }

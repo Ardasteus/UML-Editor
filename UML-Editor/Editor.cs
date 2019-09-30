@@ -19,7 +19,7 @@ namespace UML_Editor
 {
     public class Editor
     {
-        public Project CurrentProject;
+        public Project Project;
         private Renderer Renderer;
         private List<INode> Diagrams = new List<INode>();
         private IKeyboardHandlerNode FocusedKeyboardNode;
@@ -32,28 +32,27 @@ namespace UML_Editor
         private RelationshipManager RelationshipManager = new RelationshipManager();
         private ClassDiagramNode Dragged;
         private Vector DraggingVector;
-        public Editor(PictureBox renderTarget)
+        public bool isFocused = true;
+        public Editor(PictureBox renderTarget, string ProjectName)
         {
+            Project = new Project(ProjectName);
             Renderer = new Renderer(renderTarget);
-            renderTarget.MouseClick += OnMouseClick;
-            renderTarget.MouseMove += OnMouseMove;
-            renderTarget.MouseDown += OnMouseDown;
-            renderTarget.MouseUp += OnMouseUp;
-            //AddNode(new ButtonNode("btn1", new Vector(50, 50), 50, Renderer.GetTextHeight(1), () => SwitchAllResize(), new RectangleRenderElementStyle(Color.Black, Color.AliceBlue, 1)));
-            AddDiagram(new ClassDiagramNode(new Vector(-100, -100), new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None)));
+            AddDiagram(new Vector(-100, -100), new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None));
             ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            //InitializeRedrawTimer();
         }
         public void Render()
         {
-            Clear();
-            Diagrams.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(Renderer));
-            OptionsMenu?.Render(Renderer);
-            RelationshipManager.Render(Renderer);
-            Renderer.Render();
+            if(isFocused)
+            {
+                Clear();
+                Diagrams.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(Renderer));
+                OptionsMenu?.Render(Renderer);
+                RelationshipManager.Render(Renderer);
+                Renderer.Render();
+            }
         }
 
         public void Clear()
@@ -61,8 +60,10 @@ namespace UML_Editor
             Renderer.Clear();
         }
 
-        public void AddDiagram(UMLDiagram node)
+        public void AddDiagram(Vector position, ClassStructure structure)
         {
+            ClassDiagramNode node = new ClassDiagramNode(position, structure);
+            Project.AddClass(structure);
             Diagrams.Add(node);
             node.OnRemoval += OnDiagramRemoval;
         }
@@ -74,7 +75,6 @@ namespace UML_Editor
         public void RemoveDiagram(UMLDiagram diagram)
         {
             Diagrams.Remove(diagram);
-            diagram = null;
         }
 
         public void OnKeyPress(object sender, KeyPressEventArgs e)
@@ -371,7 +371,7 @@ namespace UML_Editor
             OptionsPrefab = new ContextMenuNode("cnt", mouse_positon, 0, 0, RectangleRenderElementStyle.Default);
             OptionsPrefab.AddNode(new ButtonNode("btn1", "Add a Diagram", mouse_positon, Renderer.GetTextWidth(13), Renderer.SingleTextHeight, () =>
             {
-                AddDiagram(new ClassDiagramNode(new Vector(-100, -100), new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None)));
+                AddDiagram(mouse_positon, new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None));
                 OptionsMenu = null;
             },
             RectangleRenderElementStyle.Default));
@@ -400,6 +400,11 @@ namespace UML_Editor
 
         public void OnMouseWheel(object sender, MouseEventArgs e)
         {
+        }
+        public void OnFormResize(object sender, EventArgs e)
+        {
+            Renderer.Resize();
+            Render();
         }
     }
 }

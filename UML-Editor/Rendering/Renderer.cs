@@ -16,6 +16,7 @@ namespace UML_Editor.Rendering
         public Vector Origin { get; set; }
         private int width;
         private int height;
+        public Color ClearColor = Color.Transparent;
         public float Scale { get; set; } = 1f;
         public Renderer(PictureBox pic)
         {
@@ -72,7 +73,7 @@ namespace UML_Editor.Rendering
         }
         public void Clear()
         {
-            GetGraphics().Clear(Color.White);
+            GetGraphics().Clear(ClearColor);
         }
 
         private Graphics GetGraphics()
@@ -92,6 +93,10 @@ namespace UML_Editor.Rendering
         {
             int r = 18 + (lines - 1) * 15;
             return r;
+        }
+        public void Resize()
+        {
+            plane.Image = new Bitmap(plane.Width, plane.Height);
         }
     }
 }
