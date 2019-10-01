@@ -66,8 +66,8 @@ namespace UML_Editor.Nodes
             if (node is MethodNode mn)
             {
                 Methods.Add(mn);
-                mn.OnHitboxCreation += OnHitboxCreation;
-                mn.OnHitboxDeletion += OnHitboxRemoval;
+                mn.OnHitboxCreation += AddHitbox;
+                mn.OnHitboxDeletion += RemoveHitbox;
                 CodeStructure.Methods.Add(mn.CodeStructure);
                 Height += Renderer.SingleTextHeight;
                 mn.RepositionChildren();
@@ -76,8 +76,8 @@ namespace UML_Editor.Nodes
             else if (node is PropertyNode pn)
             {
                 Properties.Add(pn);
-                pn.OnHitboxCreation += OnHitboxCreation;
-                pn.OnHitboxDeletion += OnHitboxRemoval;
+                pn.OnHitboxCreation += AddHitbox;
+                pn.OnHitboxDeletion += RemoveHitbox;
                 CodeStructure.Properties.Add(pn.CodeStructure);
                 Height += Renderer.SingleTextHeight;
                 pn.RepositionChildren();
@@ -183,15 +183,34 @@ namespace UML_Editor.Nodes
         public EventHandler<NodeEventArgs> OnUnfocused { get; set; }
         public EventHandler OnMouseClick { get; set; }
         public EventHandler<CodeStructureEventArgs> OnCodeStructureChange { get; set; }
+        public void AddHitbox(object sender, HitboxEventArgs e)
+        {
+            TriggerAreas.Add(e.Hitbox);
+        }
+
+        public void RemoveHitbox(object sender, HitboxEventArgs e)
+        {
+            TriggerAreas.Remove(e.Hitbox);
+        }
         public void ShowOptions(object sender, EventArgs e)
         {
             if (OptionsMenu == null)
+            {
                 OptionsMenu = OptionsPrefab;
+                TriggerAreas.Add(OptionsMenu.TriggerAreas[0]);
+                Children.Add(OptionsMenu);
+                OnFocused?.Invoke(this, new NodeEventArgs(this));
+            }
             else
                 OnOptionsHide?.Invoke(this, e);
         }
         public void HideOptions(object sender, EventArgs e)
         {
+            if (OptionsMenu != null)
+            {
+                Children.Remove(OptionsMenu);
+                TriggerAreas.Remove(OptionsMenu.TriggerAreas[0]);
+            }
             OptionsMenu = null;
         }
 
@@ -243,13 +262,5 @@ namespace UML_Editor.Nodes
         public Line GetLeftSide() => new Line(GetTopLeftCorner(), GetBotLeftCorner());
         public Line GetRightSide() => new Line(GetTopRightCorner(), GetBotRightCorner());
 
-        private void OnHitboxCreation(object sender, HitboxEventArgs e)
-        {
-            TriggerAreas.Add(e.Hitbox);
-        }
-        private void OnHitboxRemoval(object sender, HitboxEventArgs e)
-        {
-            TriggerAreas.Remove(e.Hitbox);
-        }
     }
 }
