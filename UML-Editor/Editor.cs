@@ -37,11 +37,6 @@ namespace UML_Editor
         {
             Project = new Project(ProjectName);
             Renderer = new Renderer(renderTarget);
-            AddDiagram(new ClassStructure(Vector.Zero, "NewClass", AccessModifiers.Public, Modifiers.None));
-            ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
         }
         public void Render()
         {
@@ -63,7 +58,12 @@ namespace UML_Editor
         public void AddDiagram(ClassStructure structure)
         {
             ClassDiagramNode node = new ClassDiagramNode(structure);
-            Project.AddClass(structure);
+            if(node.Properties.Count == 0)
+                node.AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
+            if(node.Methods.Count == 0)
+                node.AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
+            if(!Project.Classes.Contains(structure))
+                Project.AddClass(structure);
             Diagrams.Add(node);
             node.OnRemoval += OnDiagramRemoval;
         }
