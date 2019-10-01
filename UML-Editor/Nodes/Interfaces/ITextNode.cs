@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UML_Editor.EventArguments;
 
 namespace UML_Editor.Nodes
 {
-    public interface IHandlerNode : INode
+    public interface ITextNode : INode
     {
-        bool isFocused { get; set; }
+        string Text { get; set; }
+        EventHandler<TextEventArgs> OnTextChange { get; set; }
     }
 }

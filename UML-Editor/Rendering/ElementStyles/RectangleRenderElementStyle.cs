@@ -21,5 +21,6 @@ namespace UML_Editor.Rendering.ElementStyles
         public int BorderWidth { get; set; }
 
         public static RectangleRenderElementStyle Default = new RectangleRenderElementStyle(Color.Black, Color.White, 1);
+        public static RectangleRenderElementStyle Textbox = new RectangleRenderElementStyle(Color.White, Color.White, 1);
     }
 }

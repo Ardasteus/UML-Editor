@@ -7,142 +7,114 @@ using UML_Editor.Enums;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
-using UML_Editor.Others;
+using UML_Editor.EventArguments;
+using UML_Editor.Hitboxes;
 using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Geometry;
+using UML_Editor.NodeStructure;
 using UML_Editor.ProjectStructure;
 
 namespace UML_Editor.Nodes
 {
-    public class ClassDiagramNode : UMLDiagram, IOptionsNode
+    public class ClassDiagramNode : BasicContainerNode, IOptionsNode, IFocusableNode
     {
-        public ClassStructure Structure;
-        private FeatureNode FocusedFeature;
-        private LineRenderElement NameLine;
-        private LineRenderElement SeparatorLine;
-        public override string Name
-        {
-            get => NameTextBox.Text;
-            set
-            {
-                NameTextBox.Text = value;
-                Structure.Name = value;
-            }
-        }
-        public override Vector Position
-        {
-            get => BorderElement.Position;
-            set
-            {
-                BorderElement.Position = value;
-                ((RectangleHitbox)TriggerAreas[0]).Position = value;
-                Resize(this, new ResizeEventArgs(Width));
-                OnPositionChanged?.Invoke(this, new PositionEventArgs(Position));
-            }
-        }
-        public override int Width
-        {
-            get => BorderElement.Width;
-            set
-            {
-                BorderElement.Width = value;
-                ((RectangleHitbox)TriggerAreas[0]).Width = value;
-                OnResize?.Invoke(this, new ResizeEventArgs(Width));
-            }
-        }
-        public override int Height
-        {
-            get => BorderElement.Height;
-            set
-            {
-                BorderElement.Height = value;
-                ((RectangleHitbox)TriggerAreas[0]).Height = value;
-                OnResize?.Invoke(this, new ResizeEventArgs(Height));
-            }
-        }
+        public ClassStructure CodeStructure { get; set; }
         public List<PropertyNode> Properties = new List<PropertyNode>();
         public List<MethodNode> Methods = new List<MethodNode>();
-        public Modifiers Modifier { get; set; }
-        public AccessModifiers AccessModifier { get; set; }
-        public ContextMenuNode OptionsPrefab { get; set; }
-        public ContextMenuNode OptionsMenu { get; set; }
-        public bool isFocused { get; set; }
-        public EventHandler<PositionEventArgs> OnPositionChanged { get; set; }
+        public BasicContainerNode OptionsPrefab { get; set; }
+        public BasicContainerNode OptionsMenu { get; set; }
+        private TextBoxNode NameTextBox;
+        private LineRenderElement NameLine;
+        private LineRenderElement SeparatorLine;
 
-        public ClassDiagramNode(ClassStructure structure)
+        public ClassDiagramNode(ClassStructure codestructure, BasicNodeStructure structure, RectangleRenderElementStyle border_style) : base(structure, border_style)
         {
-            Vector position = structure.Position;
-            Structure = structure;
-            BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
-            TriggerAreas.Add(new RectangleHitbox(position, Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight));
-            NameTextBox = new TextBoxNode("diagram_name", structure.Name, Position, Width, Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
-            NameTextBox.OnResize = NameResize;
+            CodeStructure = codestructure;
+            NameTextBox = new TextBoxNode(new BasicTextNodeStructure(Position, Renderer.GetTextWidth(Name.Length), Height, Name), TextRenderElementStyle.Default, RectangleRenderElementStyle.Textbox);
             NameLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             SeparatorLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
+            Children.Add(NameTextBox);
             GeneratePrefab();
+            RepositionChildren();
+            SetEvents();
+        }
+        public void SetEvents()
+        {
+            OnOptionsShow += ShowOptions;
+            OnOptionsHide += HideOptions;
+            Children.OfType<IFocusableNode>().ToList().ForEach(x =>
+            {
+                x.OnFocused += HideOptions;
+                x.OnFocused += OnNodeFocus;
+                x.OnUnfocused += OnNodeUnfocus;
+            });
+        }
+        public virtual string Name
+        {
+            get => CodeStructure.Name;
+            set
+            {
+                CodeStructure.Name = value;
+                NameTextBox.Text = value;
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
+            }
         }
 
-        public void AddProperty(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
+        public override void AddNode(INode node)
         {
-            PropertyNode new_prop = new PropertyNode(new PropertyStructure(Position + new Vector(0, (Properties.Count + 1) * Renderer.SingleTextHeight), name, type, accessModifier, modifier));
-            new_prop.OnResize = Resize;
-            new_prop.OnFocused = OnFeatureFocused;
-            new_prop.OnUnfocused = OnFeatureUnfocused;
-            new_prop.OnHitboxCreate += OnHitboxCreation;
-            new_prop.OnHitboxRemoval += OnHitboxRemoval;
-            new_prop.OnRemoval += OnFeatureRemoval;
-            Properties.Add(new_prop);
-            Height += Renderer.SingleTextHeight;
-            Resize(this, new ResizeEventArgs(new_prop.Width));
-        }
-        public void AddMethod(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
-        {
-            MethodNode new_method = new MethodNode(new MethodStructure(Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), name, type, accessModifier, modifier));
-            new_method.OnResize = Resize;
-            new_method.OnFocused = OnFeatureFocused;
-            new_method.OnUnfocused = OnFeatureUnfocused;
-            new_method.OnHitboxCreate += OnHitboxCreation;
-            new_method.OnHitboxRemoval += OnHitboxRemoval;
-            new_method.OnRemoval += OnFeatureRemoval;
-            Methods.Add(new_method);
-            Height += Renderer.SingleTextHeight;
-            Resize(this, new ResizeEventArgs(new_method.Width));
+            if (node is MethodNode mn)
+            {
+                Methods.Add(mn);
+                mn.OnHitboxCreation += OnHitboxCreation;
+                mn.OnHitboxDeletion += OnHitboxRemoval;
+                CodeStructure.Methods.Add(mn.CodeStructure);
+                Height += Renderer.SingleTextHeight;
+                mn.RepositionChildren();
+                base.AddNode(node);
+            }
+            else if (node is PropertyNode pn)
+            {
+                Properties.Add(pn);
+                pn.OnHitboxCreation += OnHitboxCreation;
+                pn.OnHitboxDeletion += OnHitboxRemoval;
+                CodeStructure.Properties.Add(pn.CodeStructure);
+                Height += Renderer.SingleTextHeight;
+                pn.RepositionChildren();
+                base.AddNode(node);
+            }
         }
 
-        public void RemoveFeature(FeatureNode node)
+        public virtual AccessModifiers AccessModifier
         {
-            if (node is MethodNode m)
+            get => CodeStructure.AccessModifier;
+            set
             {
-                Methods.Remove(m);
+                CodeStructure.AccessModifier = value;
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
             }
-            else if(node is PropertyNode p)
-            {
-                Properties.Remove(p);
-            }
-            Height -= Renderer.SingleTextHeight;
-            node = null;
-            Resize();
         }
-
-        private void Resize(object sender, ResizeEventArgs args)
+        public virtual Modifiers Modifier
         {
-            if(args.Width > Width)
+            get => CodeStructure.Modifier;
+            set
             {
-                Width = args.Width;
+                CodeStructure.Modifier = value;
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
             }
-            else
-            {
-                INode temp_node = GetChildren().OrderByDescending(x => x.Width).FirstOrDefault();
-                if(temp_node.Width < Width)
-                {
-                    Width = temp_node.Width;
-                }
-            }
-            Resize();
         }
-
-        private void Resize()
+        public float GetWidest()
         {
+            INode temp_node = Children.OrderByDescending(x => x.Width).FirstOrDefault();
+            return temp_node.Width;
+        }
+        public override void RepositionChildren()
+        {
+            float new_width = GetWidest();
+            if (Width < new_width)
+                Width = new_width;
             NameTextBox.Position = new Vector((Position.X + Width / 2) - (NameTextBox.Width / 2), Position.Y);
             for (int i = 0; i < Properties.Count; i++)
             {
@@ -165,137 +137,73 @@ namespace UML_Editor.Nodes
                 SeparatorLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             }
         }
-
-        private void NameResize(object sender, ResizeEventArgs args)
+        public override void OnNodeFocus(object sender, NodeEventArgs e)
         {
-            if(args.Width / 2 > Width / 2)
+            if (FocusedNode != e.Node)
             {
-                Width = args.Width;
+                OnFocused?.Invoke(this, new NodeEventArgs(this));
+                FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                FocusedNode = (IFocusableNode)e.Node;
             }
-            else
-            {
-                INode temp_node = GetChildren().OrderByDescending(x => x.Width).FirstOrDefault();
-                if (temp_node.Width < Width)
-                {
-                    Width = temp_node.Width;
-                }
-            }
-            NameTextBox.Position = new Vector((Position.X + Width / 2) - (NameTextBox.Width / 2), Position.Y);
         }
-
-        public override List<INode> GetChildren()
+        public override void OnNodeUnfocus(object sender, NodeEventArgs e)
         {
-            List<INode> ret = new List<INode>();
-            if (OptionsMenu != null)
-                ret.Add(OptionsMenu);
-            if (FocusedFeature != null)
-                ret.Add(FocusedFeature);
-            ret.Add(NameTextBox);
-            ret.AddRange(Properties.Where(x => x != FocusedFeature));
-            ret.AddRange(Methods.Where(x => x != FocusedFeature));
-            return ret;
+            if (FocusedNode == e.Node)
+                FocusedNode = null;
+        }
+        public void GeneratePrefab()
+        {
+            float total_Width = Renderer.GetTextWidth(13);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Regular", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    Modifier = Modifiers.None;
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Abstract", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    Modifier = Modifiers.Abstract;
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    Modifier = Modifiers.Static;
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+        }
+        public EventHandler OnOptionsShow { get; set; }
+        public EventHandler OnOptionsHide { get; set; }
+        public EventHandler<NodeEventArgs> OnFocused { get; set; }
+        public EventHandler<NodeEventArgs> OnUnfocused { get; set; }
+        public EventHandler OnMouseClick { get; set; }
+        public EventHandler<CodeStructureEventArgs> OnCodeStructureChange { get; set; }
+        public void ShowOptions(object sender, EventArgs e)
+        {
+            if (OptionsMenu == null)
+                OptionsMenu = OptionsPrefab;
+            else
+                OnOptionsHide?.Invoke(this, e);
+        }
+        public void HideOptions(object sender, EventArgs e)
+        {
+            OptionsMenu = null;
         }
 
         public override void Render(Renderer renderer)
         {
-            BorderElement.Render(renderer);
-            NameTextBox.Render(renderer);
-            Properties.ForEach(x => x.Render(renderer));
-            Methods.ForEach(x => x.Render(renderer));
-            NameLine.Render(renderer);
+            base.Render(renderer);
             SeparatorLine.Render(renderer);
+            NameLine.Render(renderer);
             BorderElement.BorderOnly(renderer);
-            FocusedFeature?.AccessModifiersContextMenu?.Render(renderer);
-            FocusedFeature?.OptionsMenu?.Render(renderer);
-            OptionsMenu?.Render(renderer);
-        }
-
-        public void GeneratePrefab()
-        {
-            OptionsPrefab = new ContextMenuNode("cnt", Vector.Zero, 0, 0, RectangleRenderElementStyle.Default);
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Add Property", Vector.Zero, Renderer.GetTextWidth(12), Renderer.SingleTextHeight, () =>
-            {
-                AddProperty("Property", "Type", AccessModifiers.Public, Modifiers.None);
-                OptionsMenu = null;
-                TriggerAreas.RemoveAt(1);
-                GeneratePrefab();
-            },
-            RectangleRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Add Method", Vector.Zero, Renderer.GetTextWidth(10), Renderer.SingleTextHeight, () =>
-            {
-                OptionsMenu = null;
-                AddMethod("Method", "Type", AccessModifiers.Public, Modifiers.None);
-                TriggerAreas.RemoveAt(1);
-                GeneratePrefab();
-            },
-            RectangleRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Remove", Vector.Zero, Renderer.GetTextWidth(6), Renderer.SingleTextHeight, () =>
-            {
-                OptionsMenu = null;
-                TriggerAreas.RemoveAt(1);
-                OnRemoval?.Invoke(this, new DiagramRemovalEventArgs(this));
-            },
-            RectangleRenderElementStyle.Default));
-        }
-
-        public void ShowOptionsMenu()
-        {
-            if (OptionsMenu == null)
-            {
-                FocusedFeature?.OnUnfocused?.Invoke(this, new EventArgs());
-                TriggerAreas.Add(new RectangleHitbox(OptionsPrefab.Position, OptionsPrefab.Width, OptionsPrefab.Height));
-                OptionsMenu = OptionsPrefab;
-            }
-            else
-            {
-                TriggerAreas.RemoveAt(1);
-                OptionsMenu = null;
-            }
-        }
-
-        public void HandleMouse()
-        {
-        }
-
-        private void OnFeatureFocused(object sender, EventArgs e)
-        {
-            if(FocusedFeature == sender)
-            {
-                if (OptionsMenu != null)
-                {
-                    TriggerAreas.RemoveAt(1);
-                    OptionsMenu = null;
-                }
-            }
-            else if(FocusedFeature == null)
-            {
-                FocusedFeature = (FeatureNode)sender;
-                if(OptionsMenu != null)
-                {
-                    TriggerAreas.RemoveAt(1);
-                    OptionsMenu = null;
-                }
-            }
-            else
-            {
-                FocusedFeature.OnUnfocused(this, new EventArgs());
-                FocusedFeature = (FeatureNode)sender;
-            }
-        }
-        private void OnFeatureUnfocused(object sender, EventArgs e)
-        {
-            if (FocusedFeature?.AccessModifiersContextMenu != null)
-            {
-                FocusedFeature.TriggerAreas.RemoveAt(1);
-                FocusedFeature.AccessModifiersContextMenu = null;
-                FocusedFeature.IsMenuShown = false;
-            }
-            else if(FocusedFeature?.OptionsMenu != null)
-            {
-                FocusedFeature.TriggerAreas.RemoveAt(1);
-                FocusedFeature.OptionsMenu = null;
-            }
-            FocusedFeature = null;
+            ((PropertyNode)FocusedNode)?.FocusedNode?.Render(renderer);
+            ((PropertyNode)FocusedNode)?.OptionsMenu?.Render(renderer);
+            ((PropertyNode)FocusedNode)?.AccessModifierMenu?.Render(renderer);
         }
 
         public bool IsOnEdge(Vector v)
@@ -342,18 +250,6 @@ namespace UML_Editor.Nodes
         private void OnHitboxRemoval(object sender, HitboxEventArgs e)
         {
             TriggerAreas.Remove(e.Hitbox);
-        }
-
-        private void OnFeatureRemoval(object sender, FeatureRemovalEventArgs e)
-        {
-            RemoveFeature(e.FeatureNode);
-        }
-
-        public void Unfocus()
-        {
-            if (OptionsMenu != null)
-                OptionsMenu = null;
-            FocusedFeature?.OnUnfocused(this, new EventArgs());
         }
     }
 }

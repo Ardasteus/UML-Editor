@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UML_Editor.Nodes;
-using UML_Editor.Others;
+using UML_Editor.Hitboxes;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
@@ -13,7 +13,7 @@ using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Relationships
 {
-    public class RelationshipSegment : IRenderableNode
+    public class RelationshipSegment //: IRenderableNode
     {
         public string Name { get; set; }
         public Vector Position
@@ -25,8 +25,8 @@ namespace UML_Editor.Relationships
                 CreateHitboxes();
             }
         }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; } = new List<IHitbox>();
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
         private List<RectangleRenderElement> DebugRectangles = new List<RectangleRenderElement>();
@@ -52,8 +52,8 @@ namespace UML_Editor.Relationships
                 CreateHitboxes();
             }
         }
-        public ContextMenuNode OptionsPrefab { get; set; }
-        public ContextMenuNode OptionsMenu { get; set; }
+        public BasicContainerNode OptionsPrefab { get; set; }
+        public BasicContainerNode OptionsMenu { get; set; }
         public bool isFocused { get; set; }
         public EventHandler OnFocused { get; set; }
         public EventHandler OnUnfocused { get; set; }

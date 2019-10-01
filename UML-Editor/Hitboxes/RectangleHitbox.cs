@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 using UML_Editor.Geometry;
 using UML_Editor.Rendering;
 
-namespace UML_Editor.Others
+namespace UML_Editor.Hitboxes
 {
     public class RectangleHitbox : IHitbox
     {
-        public RectangleHitbox(Vector position, int width, int height)
+        public RectangleHitbox(Vector position, float width, float height)
         {
             Position = new Vector(position.X, position.Y);
             Width = width;
             Height = height;
         }
 
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         public Vector Position { get; set; }
         public bool IsTriggerable { get; set; } = true;
 

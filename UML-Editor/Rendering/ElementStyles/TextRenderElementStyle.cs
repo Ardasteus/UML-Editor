@@ -30,6 +30,6 @@ namespace UML_Editor.Rendering.ElementStyles
             Color = color;
         }
 
-        public TextRenderElementStyle Default = new TextRenderElementStyle(12, FontStyle.Regular, "Arial", Color.Black);
+        public static TextRenderElementStyle Default = new TextRenderElementStyle(12, FontStyle.Regular, "Consolas", Color.Black);
     }
 }

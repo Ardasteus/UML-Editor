@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UML_Editor.Geometry;
 using UML_Editor.Rendering;
 
-namespace UML_Editor.Others
+namespace UML_Editor.Hitboxes
 {
     public interface IHitbox
     {

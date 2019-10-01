@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UML_Editor.Others;
+using UML_Editor.Hitboxes;
 using UML_Editor.Rendering;
 using UML_Editor.Nodes;
 using System.Drawing;
@@ -23,10 +23,10 @@ namespace UML_Editor
         private int MaxProject = 5;
         public EditorControler(PictureBox tab, PictureBox renderPlane)
         {
-            Buttons.Add(new ButtonNode("btn", "+", Vector.Zero, Renderer.SingleTextWidth, Renderer.SingleTextHeight, () =>
-            {
-                CreateNewProject();
-            }, RectangleRenderElementStyle.Default));
+            //Buttons.Add(new ButtonNode("btn", "+", Vector.Zero, Renderer.SingleTextWidth, Renderer.SingleTextHeight, () =>
+            //{
+            //    CreateNewProject();
+            //}, RectangleRenderElementStyle.Default));
             Plane = renderPlane;
             tab.Height = Renderer.SingleTextHeight;
             tab.MouseClick += Tab_MouseClick;
@@ -50,7 +50,7 @@ namespace UML_Editor
             ButtonNode node = Buttons.FirstOrDefault(x => CheckIfClicked(e.Location, x));
             if(node != null)
             {
-                node.HandleMouse();
+                node.OnMouseClick(this, e);
             }
             Render();
         }
@@ -101,17 +101,15 @@ namespace UML_Editor
                 Editor newEdit = new Editor(Plane, "New Project" + (Editors.Count + 1).ToString());
                 newEdit.isFocused = false;
                 Editors.Add(newEdit);
-                float final_pos = Buttons.Last().Position.X + Buttons.Last().Width;
-                Buttons.Add(new ButtonNode("btn", "Project" + Editors.Count, new Vector(final_pos, 0), Renderer.GetTextWidth(8), Renderer.SingleTextHeight, () =>
-                {
-                   ChangeEditor(newEditor);
-                }, RectangleRenderElementStyle.Default));
+                //float final_pos = Buttons.Last().Position.X + Buttons.Last().Width;
+                //Buttons.Add(new ButtonNode("btn", "Project" + Editors.Count, new Vector(final_pos, 0), Renderer.GetTextWidth(8), Renderer.SingleTextHeight, () =>
+                //{
+                //   ChangeEditor(newEditor);
+                //}, RectangleRenderElementStyle.Default));
             }
         }
 
         public void OnKeyPress(object sender, KeyPressEventArgs e) => CurrentEditor.OnKeyPress(sender, e);
-        public void OnKeyDown(object sender, KeyEventArgs e) => CurrentEditor.OnKeyDown(sender, e);
-        public void OnKeyUp(object sender, KeyEventArgs e) => CurrentEditor.OnKeyUp(sender, e);
         public void OnResize(object sender, EventArgs e) => CurrentEditor.OnFormResize(sender, e);
     }
 }

@@ -11,8 +11,8 @@ namespace UML_Editor.Rendering.RenderingElements
     public class RectangleRenderElement : IRenderElement
     {
         public Vector Position { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         private Pen DrawPen { get; set; }
         private SolidBrush FillBrush { get; set; }
         private Color borderColor;
@@ -41,8 +41,8 @@ namespace UML_Editor.Rendering.RenderingElements
                 FillBrush.Color = fillColor;
             }
         }
-        private int borderWidth;
-        public int BorderWidth
+        private float borderWidth;
+        public float BorderWidth
         {
             get
             {
@@ -54,7 +54,7 @@ namespace UML_Editor.Rendering.RenderingElements
                 DrawPen.Width = borderWidth;
             }
         }
-        public RectangleRenderElement(Vector position, int width, int height, Color fill_color, Color border_color, int border_width = 1)
+        public RectangleRenderElement(Vector position, float width, float height, Color fill_color, Color border_color, int border_width = 1)
         {
             DrawPen = new Pen(border_color, border_width);
             FillBrush = new SolidBrush(fill_color);

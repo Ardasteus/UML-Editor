@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UML_Editor.Others
+namespace UML_Editor
 {
     public class EditorChangeEventArgs
     {

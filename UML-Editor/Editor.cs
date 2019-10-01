@@ -9,10 +9,11 @@ using UML_Editor.Rendering;
 using UML_Editor.Nodes;
 using UML_Editor.Rendering.ElementStyles;
 using UML_Editor.Enums;
-using UML_Editor.Others;
+using UML_Editor.EventArguments;
+using UML_Editor.Hitboxes;
 using UML_Editor.Relationships;
-using UML_Editor.CodeGenerating;
 using UML_Editor.Geometry;
+using UML_Editor.NodeStructure;
 using UML_Editor.ProjectStructure;
 
 namespace UML_Editor
@@ -22,17 +23,18 @@ namespace UML_Editor
         public Project Project;
         private Renderer Renderer;
         private List<INode> Diagrams = new List<INode>();
-        private IKeyboardHandlerNode FocusedKeyboardNode;
-        private ContextMenuNode OptionsPrefab;
-        private ContextMenuNode OptionsMenu;
+        private IFocusableNode focusedNode;
+        private IKeyboardFocusableNode FocusedKeyboardNode;
+        private BasicContainerNode OptionsPrefab;
+        private BasicContainerNode OptionsMenu;
         private ClassDiagramNode CurrentFocusedDiagram;
         private Relationship CurrentFocusedRelationship;
         private bool IsCreatingRelationship = false;
+        public bool isFocused = false;
         private ClassDiagramNode RelationshipOrigin { get; set; }
         private RelationshipManager RelationshipManager = new RelationshipManager();
         private ClassDiagramNode Dragged;
         private Vector DraggingVector;
-        public bool isFocused = true;
         public Editor(PictureBox renderTarget, string ProjectName)
         {
             Project = new Project(ProjectName);
@@ -55,49 +57,36 @@ namespace UML_Editor
             Renderer.Clear();
         }
 
-        public void AddDiagram(ClassStructure structure)
+        public void ClearFocus()
         {
-            ClassDiagramNode node = new ClassDiagramNode(structure);
-            if(node.Properties.Count == 0)
-                node.AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
-            if(node.Methods.Count == 0)
-                node.AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
-            if(!Project.Classes.Contains(structure))
-                Project.AddClass(structure);
-            Diagrams.Add(node);
-            node.OnRemoval += OnDiagramRemoval;
+            focusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(focusedNode));
+            focusedNode = null;
         }
 
-        private void OnDiagramRemoval(object sender, DiagramRemovalEventArgs e)
+        public void AddDiagram(ClassStructure structure)
         {
-            RemoveDiagram(e.Diagram);
-        }
-        public void RemoveDiagram(UMLDiagram diagram)
-        {
-            Diagrams.Remove(diagram);
+            ClassDiagramNode node = new ClassDiagramNode(structure, new BasicNodeStructure(structure.Position, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Default);
+            node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
+            node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
+            node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
+            node.AddNode(new MethodNode(new MethodStructure(Vector.Zero, "Prop", "Type", "Name : Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
+            if (!Project.Classes.Contains(structure))
+                Project.AddClass(structure);
+            Diagrams.Add(node);
+            //node.OnRemoval += OnDiagramRemoval;
         }
 
         public void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            if(FocusedKeyboardNode != null)
+            if(focusedNode != null && focusedNode is IKeyboardFocusableNode keyNode)
             {
                 if(e.KeyChar != (char)13)
-                    FocusedKeyboardNode.HandleKey(e.KeyChar);
+                    keyNode.OnKeyPress?.Invoke(sender, e);
                 else
                 {
-                    FocusedKeyboardNode.HandleKey(e.KeyChar);
-                    if (!FocusedKeyboardNode.isFocused)
-                        FocusedKeyboardNode = null;
+                    ClearFocus();
                 }
             }
-            Render();
-        }
-        public void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            Render();
-        }
-        public void OnKeyUp(object sender, KeyEventArgs e)
-        {
             Render();
         }
 
@@ -106,6 +95,7 @@ namespace UML_Editor
             Vector mouse_position = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
             if (e.Button == MouseButtons.Left)
             {
+                ClearFocus();
                 if (Dragged != null)
                     Dragged.Position = mouse_position + DraggingVector;
                 else
@@ -142,28 +132,29 @@ namespace UML_Editor
         public void OnMouseClick(object sender, MouseEventArgs e)
         {
             Vector mouse_position = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
+            ClearFocus();
             if (e.Button == MouseButtons.Left)
             {
-                HandleLeftClick(mouse_position);
+                HandleLeftClick(mouse_position, e);
             }
             else if(e.Button == MouseButtons.Right)
             {
-                HandleRightClick(mouse_position);
+                HandleRightClick(mouse_position, e);
             }
 
             Render();
         }
 
-        private void HandleLeftClick(Vector mouse_position)
+        private void HandleLeftClick(Vector mouse_position, MouseEventArgs e)
         {
             INode temp = null;
             if (OptionsMenu != null && CheckIfClicked(mouse_position, OptionsMenu))
                 temp = OptionsMenu;
-            else if (RelationshipManager.Relationships.Count > 0 && RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x)) != null)
-                temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            //else if (RelationshipManager.Relationships.Count > 0 && RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x)) != null)
+            //    temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             else
                 temp = Diagrams.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            if (IsCreatingRelationship && temp != null && temp is UMLDiagram)
+            if (IsCreatingRelationship && temp != null && temp is ClassDiagramNode)
             {
                 if (RelationshipOrigin == null)
                     RelationshipOrigin = (ClassDiagramNode)temp;
@@ -176,79 +167,28 @@ namespace UML_Editor
             }
             else
             {
-                if (OptionsMenu != null)
-                    OptionsMenu = null;
-                if (temp is ClassDiagramNode)
-                    CurrentFocusedDiagram = (ClassDiagramNode)temp;
-                IMouseHandlerNode node = SearchForClicked(temp, mouse_position);
+                IFocusableNode node = SearchForClicked(temp, mouse_position);
                 if (node != null)
                 {
-                    if (FocusedKeyboardNode != null)
-                    {
-                        if (node is IKeyboardHandlerNode kn)
-                        {
-                            if (FocusedKeyboardNode != kn)
-                            {
-                                FocusedKeyboardNode.isFocused = false;
-                                FocusedKeyboardNode = kn;
-                            }
-                        }
-                        else
-                        {
-                            FocusedKeyboardNode.isFocused = false;
-                            FocusedKeyboardNode = null;
-                        }
-                    }
-                    else
-                    {
-                        if (node is IKeyboardHandlerNode n)
-                        {
-                            FocusedKeyboardNode = n;
-                        }
-                    }
-
-                    node.isFocused = true;
-                    node.HandleMouse();
-                    if (CurrentFocusedDiagram != null && CurrentFocusedDiagram != temp)
-                    {
-                        CurrentFocusedDiagram.Unfocus();
-                        CurrentFocusedDiagram = null;
-                    }
-                }
-                else
-                {
-                    if (FocusedKeyboardNode != null)
-                    {
-                        FocusedKeyboardNode.isFocused = false;
-                        FocusedKeyboardNode = null;
-                    }
-                    if (CurrentFocusedDiagram != null)
-                    {
-                        CurrentFocusedDiagram.Unfocus();
-                        CurrentFocusedDiagram = null;
-                    }
+                    focusedNode = node;
+                    node.OnFocused?.Invoke(this, new NodeEventArgs(node));
+                    if(node is IMouseFocusableNode mn)
+                        mn.OnMouseClick?.Invoke(this, e);
                 }
             }
         }
-        private void HandleRightClick(Vector mouse_position)
+        private void HandleRightClick(Vector mouse_position, MouseEventArgs e)
         {
             INode temp = Diagrams.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            if (OptionsMenu != null)
-                OptionsMenu = null;
-            if (FocusedKeyboardNode != null)
-            {
-                FocusedKeyboardNode.isFocused = false;
-                FocusedKeyboardNode = null;
-            }
-            if (temp == null)
-            {
-                temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            }
+            //if (temp == null)
+            //{
+            //    temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            //}
             if (temp == null)
             {
                 if (CurrentFocusedDiagram != null)
                 {
-                    CurrentFocusedDiagram.Unfocus();
+                    //CurrentFocusedDiagram.Unfocus();
                     CurrentFocusedDiagram = null;
                 }
                 if(CurrentFocusedRelationship != null)
@@ -274,42 +214,41 @@ namespace UML_Editor
                     CurrentFocusedDiagram = (ClassDiagramNode)temp;
                     IOptionsNode op = SearchForOptionsNode(temp, mouse_position);
                     op.OptionsPrefab.Position = mouse_position;
-                    op.ShowOptionsMenu();
+                    op.OnOptionsShow?.Invoke(this, EventArgs.Empty);
                 }
-                else if(temp is Relationship r)
-                {
-                    if(CurrentFocusedDiagram != null)
-                    {
-                        CurrentFocusedDiagram.Unfocus();
-                        CurrentFocusedDiagram = null;
-                    }
-                    if (CurrentFocusedRelationship != null)
-                    {
-                        if(CurrentFocusedRelationship != r)
-                        {
-                            CurrentFocusedRelationship.ShowOptionsMenu();
-                            CurrentFocusedRelationship = null;
-                        }
-                    }
-                    CurrentFocusedRelationship = r;
-                    if(r.OptionsMenu != null)
-                    {
-                        r.ShowOptionsMenu();
-                    }
-                    r.OptionsPrefab.Position = mouse_position;
-                    r.ShowOptionsMenu();
-                }
+                //else if(temp is Relationship r)
+                //{
+                //    if(CurrentFocusedDiagram != null)
+                //    {
+                //        CurrentFocusedDiagram = null;
+                //    }
+                //    if (CurrentFocusedRelationship != null)
+                //    {
+                //        if(CurrentFocusedRelationship != r)
+                //        {
+                //            CurrentFocusedRelationship.ShowOptionsMenu();
+                //            CurrentFocusedRelationship = null;
+                //        }
+                //    }
+                //    CurrentFocusedRelationship = r;
+                //    if(r.OptionsMenu != null)
+                //    {
+                //        r.ShowOptionsMenu();
+                //    }
+                //    r.OptionsPrefab.Position = mouse_position;
+                //    r.ShowOptionsMenu();
+                //}
             }
         }
 
-        private IMouseHandlerNode SearchForClicked(INode parent_node, Vector mouse_position)
+        private IFocusableNode SearchForClicked(INode parent_node, Vector mouse_position)
         {
             bool found = false;
             while (!found)
             {
-                if (parent_node is IContainerNode cn && parent_node is IMouseHandlerNode mn)
+                if (parent_node is IContainerNode cn && parent_node is IMouseFocusableNode mn)
                 {
-                    INode n = cn.GetChildren().FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+                    INode n = cn.Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
                     if (n == null)
                     {
                         return mn;
@@ -319,7 +258,7 @@ namespace UML_Editor
                 }
                 else if (parent_node is IContainerNode c)
                 {
-                    INode n = c.GetChildren().FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+                    INode n = c.Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
                     if (n == null)
                     {
                         return null;
@@ -327,7 +266,7 @@ namespace UML_Editor
                     else
                         parent_node = n;
                 }
-                else if (parent_node is IMouseHandlerNode m)
+                else if (parent_node is IFocusableNode m)
                 {
                     return m;
                 }
@@ -344,7 +283,7 @@ namespace UML_Editor
             {
                 if (parent_node is IContainerNode cn && parent_node is IOptionsNode op)
                 {
-                    INode n = cn.GetChildren().FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+                    INode n = cn.Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
                     if (n == null || !(n is IOptionsNode))
                         return op;
                     else
@@ -368,25 +307,27 @@ namespace UML_Editor
         }
         private void GeneratePrefab(Vector mouse_positon)
         {
-            OptionsPrefab = new ContextMenuNode("cnt", mouse_positon, 0, 0, RectangleRenderElementStyle.Default);
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Add a Diagram", mouse_positon, Renderer.GetTextWidth(13), Renderer.SingleTextHeight, () =>
-            {
-                AddDiagram(new ClassStructure(mouse_positon, "NewClass", AccessModifiers.Public, Modifiers.None));
-                OptionsMenu = null;
-            },
-            RectangleRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Create a Relationship", mouse_positon, Renderer.GetTextWidth(21), Renderer.SingleTextHeight, () =>
-            {
-                IsCreatingRelationship = true;
-                OptionsMenu = null;
-            },
-            RectangleRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Export", mouse_positon, Renderer.GetTextWidth(6), Renderer.SingleTextHeight, () =>
-            {
-                GenerateCode();
-                OptionsMenu = null;
-            },
-            RectangleRenderElementStyle.Default));
+            float total_Width = Renderer.GetTextWidth(21);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(mouse_positon, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Add a Diagram", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    AddDiagram(new ClassStructure(mouse_positon, "NewClass", "class", AccessModifiers.Public, Modifiers.None));
+                    OptionsMenu = null;
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Abstract", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    OptionsMenu = null;
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    OptionsMenu = null;
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
         }
 
         private void GenerateCode()

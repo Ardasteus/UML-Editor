@@ -5,147 +5,309 @@ using System.Text;
 using System.Threading.Tasks;
 using UML_Editor.Rendering;
 using UML_Editor.Enums;
-using UML_Editor.Rendering.ElementStyles;
-using System.Drawing;
 using UML_Editor.Rendering.RenderingElements;
-using UML_Editor.Others;
+using UML_Editor.Rendering.ElementStyles;
+using UML_Editor.Hitboxes;
+using System.Drawing;
+using System.Windows.Forms;
+using UML_Editor.EventArguments;
 using UML_Editor.Geometry;
+using UML_Editor.NodeStructure;
 using UML_Editor.ProjectStructure;
 
 namespace UML_Editor.Nodes
 {
-    public class PropertyNode : FeatureNode
+    public class PropertyNode : BasicContainerNode, IOptionsNode
     {
-        public PropertyStructure Structure;
+        public BasicContainerNode AccessModifierMenu { get; set; }
+        public BasicContainerNode MenuPrefab { get; set; }
+        public ButtonNode AccessModifierButton { get; set; }
+        public TextBoxNode TypeTextBox { get; set; }
+        public TextBoxNode NameTextBox { get; set; }
+        public LabelNode Separator { get; set; }
 
-        public override string Name
+        public PropertyStructure CodeStructure { get; set; }
+
+        public PropertyNode(PropertyStructure codeStructure, BasicNodeStructure structure, RectangleRenderElementStyle border_style) : base(structure, border_style)
         {
-            get => NameTextBox.Text;
+            CodeStructure = codeStructure;
+            AccessModifierButton = new ButtonNode(new ButtonStructure(Position, "+", Renderer.SingleTextWidth, Height, () => OnMenuShow?.Invoke(this, EventArgs.Empty)), RectangleRenderElementStyle.Textbox, TextRenderElementStyle.Default);
+            NameTextBox = new TextBoxNode( new BasicTextNodeStructure(Position, Renderer.GetTextWidth(Name.Length), Height, Name), TextRenderElementStyle.Default, RectangleRenderElementStyle.Textbox);
+            Separator = new LabelNode(new BasicTextNodeStructure(Position, Renderer.SingleTextWidth, Height, ":"), TextRenderElementStyle.Default, RectangleRenderElementStyle.Textbox);
+            TypeTextBox = new TextBoxNode(new BasicTextNodeStructure(Position, Renderer.GetTextWidth(Type.Length), Height, Type), TextRenderElementStyle.Default, RectangleRenderElementStyle.Textbox);
+            Children.Add(AccessModifierButton);
+            Children.Add(NameTextBox);
+            Children.Add(Separator);
+            Children.Add(TypeTextBox);
+            OnUnfocused += OnUnFocus;
+            GenerateMenu();
+            GenerateOptions();
+            SetEvents();
+        }
+
+        public void SetEvents()
+        {
+            OnMenuHide += HideMenu;
+            OnMenuShow += ShowMenu;
+            OnOptionsShow += ShowOptions;
+            OnOptionsHide += HideOptions;
+            OnOptionsShow += HideMenu;
+            OnMenuShow += HideOptions;
+            OnChange += HideMenu;
+            OnChange += HideOptions;
+            Children.ForEach(x => x.OnResize += OnChildResize);
+            Children.OfType<IFocusableNode>().ToList().ForEach(x =>
+            {
+                x.OnFocused += HideMenu;
+                x.OnFocused += HideOptions;
+                x.OnFocused += OnNodeFocus;
+                x.OnUnfocused += OnNodeUnfocus;
+            });
+        }
+        public virtual string Name
+        {
+            get => CodeStructure.Name;
             set
             {
+                CodeStructure.Name = value;
                 NameTextBox.Text = value;
-                Structure.Name = value;
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
             }
         }
-        public override string Type
+        public virtual string Type
         {
-            get => TypeTextBox.Text;
+            get => CodeStructure.Type;
             set
             {
+                CodeStructure.Type = value;
                 TypeTextBox.Text = value;
-                Structure.Type = value;
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
             }
         }
 
-        public override Modifiers Modifier
+        public virtual AccessModifiers AccessModifier
         {
-            get => base.Modifier;
+            get => CodeStructure.AccessModifier;
             set
             {
-                base.Modifier = value;
-                Structure.Modifier = value;
+                CodeStructure.AccessModifier = value;
+                SetAccessModifier();
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
             }
         }
-        public override AccessModifiers AccessModifier
+        public virtual Modifiers Modifier
         {
-            get => base.AccessModifier;
+            get => CodeStructure.Modifier;
             set
             {
-                base.AccessModifier = value;
-                Structure.AccessModifier = value;
-            }
-        }
-
-        public PropertyNode(PropertyStructure structure) : base()
-        {
-            Vector position = structure.Position;
-            Structure = structure;
-            AccessModifier = Structure.AccessModifier;
-            Modifier = Structure.Modifier;
-            AccessModifierButton = new ButtonNode("accs_btn", GetModifierChar(), position, Renderer.SingleTextWidth, Renderer.SingleTextHeight, ShowMenu, new RectangleRenderElementStyle(Color.White, Color.White, 1));
-            NameTextBox = new TextBoxNode("type_txt", structure.Name, position + new Vector(Renderer.SingleTextWidth, 0), Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
-            Separator = new LabelNode("separator", ":", position + new Vector(NameTextBox.Width + AccessModifierButton.Width, 0));
-            TypeTextBox = new TextBoxNode("type_txt", structure.Type, position + new Vector(NameTextBox.Width + AccessModifierButton.Width + Separator.Width, 0), Renderer.GetTextWidth(structure.Type.Length), Renderer.SingleTextHeight, Color.Black, Color.White, Color.White);
-            BorderElement = new RectangleRenderElement(position, GetWidth(), Renderer.SingleTextHeight, Color.White, Color.Black);
-            TriggerAreas.Add(new RectangleHitbox(position, Width, Height));
-            NameTextBox.OnResize = Resize;
-            TypeTextBox.OnResize = Resize;
-            GeneratePrefab();
-            GenerateOptionsMenu();
-        }
-
-        public override Vector Position
-        {
-            get => BorderElement.Position;
-            set
-            {
-                BorderElement.Position = value;
-                ((RectangleHitbox)TriggerAreas[0]).Position = value;
-                AccessModifierButton.Position = Position;
-                NameTextBox.Position = new Vector(Position.X + AccessModifierButton.Width, Position.Y);
-                Separator.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
-                TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width + Separator.Width, Position.Y);
-                GeneratePrefab();
-            }
-        }
-        public override int Width
-        {
-            get => BorderElement.Width;
-            set
-            {
-                BorderElement.Width = value;
-                ((RectangleHitbox)TriggerAreas[0]).Width = value;
-                OnResize?.Invoke(this, new ResizeEventArgs(Width));
-            }
-        }
-        public override int Height
-        {
-            get => BorderElement.Height;
-            set
-            {
-                BorderElement.Height = value;
-                ((RectangleHitbox)TriggerAreas[0]).Height = value;
+                CodeStructure.Modifier = value;
+                SetModifier();
+                OnCodeStructureChange?.Invoke(this, new CodeStructureEventArgs(CodeStructure));
+                OnChange?.Invoke(this, EventArgs.Empty);
             }
         }
 
-        public override int GetWidth()
+        public virtual float GetWidth()
         {
-            return AccessModifierButton.Width + NameTextBox.Width + TypeTextBox.Width + Separator.Width;
+            return AccessModifierButton.Width + NameTextBox.Width + Separator.Width + TypeTextBox.Width;
         }
 
-        private void Resize(object sender, ResizeEventArgs args)
+        public void OnUnFocus(object sender, NodeEventArgs e)
         {
-            Width = GetWidth();
+            FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+        }
+        public override void OnNodeFocus(object sender, NodeEventArgs e)
+        {
+            if (FocusedNode != e.Node)
+            {
+                OnFocused?.Invoke(this, new NodeEventArgs(this));
+                FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                FocusedNode = (IFocusableNode)e.Node;
+            }
+        }
+        public override void OnNodeUnfocus(object sender, NodeEventArgs e)
+        {
+            if (FocusedNode == e.Node)
+                FocusedNode = null;
+        }
+        public override void RepositionChildren()
+        {
+            float new_width = GetWidth();
+            if (Width < new_width)
+                Width = new_width;
+            if (Height != Renderer.SingleTextHeight)
+                Height = Renderer.SingleTextHeight;
+            AccessModifierButton.Position = new Vector(Position.X, Position.Y);
             NameTextBox.Position = new Vector(Position.X + AccessModifierButton.Width, Position.Y);
             Separator.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width, Position.Y);
             TypeTextBox.Position = new Vector(Position.X + AccessModifierButton.Width + NameTextBox.Width + Separator.Width, Position.Y);
         }
 
-        public override List<INode> GetChildren()
-        {
-            List<INode> ret = new List<INode>();
-            if (AccessModifiersContextMenu != null)
-                ret.Add(AccessModifiersContextMenu);
-            if (OptionsMenu != null)
-                ret.Add(OptionsMenu);
-            ret.Add(AccessModifierButton);
-            ret.Add(TypeTextBox);
-            ret.Add(NameTextBox);
-            ret.Add(Separator);
-            return ret;
-        }
-
         public override void Render(Renderer renderer)
         {
-            BorderElement.Render(renderer);
-            AccessModifierButton.Render(renderer);
-            NameTextBox.Render(renderer);
-            TypeTextBox.Render(renderer);
-            Separator.Render(renderer);
-            if (AccessModifiersContextMenu != null)
-                AccessModifiersContextMenu.Render(renderer);
-            if (OptionsMenu != null)
-                OptionsMenu.Render(renderer);
+            base.Render(renderer);
+            OptionsMenu?.Render(renderer);
+            AccessModifierMenu?.Render(renderer);
         }
+
+        public virtual void SetAccessModifier()
+        {
+            switch (AccessModifier)
+            {
+                case AccessModifiers.Private:
+                    AccessModifierButton.Text = "-";
+                    break;
+                case AccessModifiers.Public:
+                    AccessModifierButton.Text = "+";
+                    break;
+                case AccessModifiers.Protected:
+                    AccessModifierButton.Text = "#";
+                    break;
+                default:
+                    AccessModifierButton.Text = "E";
+                    break;
+            }
+        }
+
+        public virtual void SetModifier()
+        {
+            switch (Modifier)
+            {
+                case Modifiers.None:
+                    NameTextBox.Style = FontStyle.Regular;
+                    break;
+                case Modifiers.Static:
+                    NameTextBox.Style = FontStyle.Underline;
+                    break;
+                case Modifiers.Abstract:
+                    NameTextBox.Style = FontStyle.Italic;
+                    break;
+            }
+        }
+
+        public EventHandler<NodeEventArgs> OnFocused { get; set; }
+        public EventHandler<NodeEventArgs> OnUnfocused { get; set; }
+        public EventHandler<CodeStructureEventArgs> OnCodeStructureChange { get; set; }
+        public EventHandler OnMouseClick { get; set; }
+        public BasicContainerNode OptionsPrefab { get; set; }
+        public BasicContainerNode OptionsMenu { get; set; }
+        public virtual void GenerateOptions()
+        {
+            float total_Width = Renderer.GetTextWidth(13);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Regular", total_Width, Renderer.SingleTextHeight , () =>
+                {
+                    Modifier = Modifiers.None;
+                    RemoveHitbox(OptionsMenu.TriggerAreas[0]);
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Abstract", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    Modifier = Modifiers.Abstract;
+                    RemoveHitbox(OptionsMenu.TriggerAreas[0]);
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    Modifier = Modifiers.Static;
+                    RemoveHitbox(OptionsMenu.TriggerAreas[0]);
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+        }
+
+        public virtual void GenerateMenu()
+        {
+            float total_Width = Renderer.GetTextWidth(9);
+            MenuPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            MenuPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Public", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    AccessModifier = AccessModifiers.Public;
+                    RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
+                    OnMenuHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            MenuPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Private", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    AccessModifier = AccessModifiers.Private;
+                    RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
+                    OnMenuHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            MenuPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Protected", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    AccessModifier = AccessModifiers.Protected;
+                    RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
+                    OnMenuHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+        }
+
+        public void AddHitbox(IHitbox hitbox)
+        {
+            TriggerAreas.Add(hitbox);
+            OnHitboxCreation?.Invoke(this, new HitboxEventArgs(hitbox));
+        }
+
+        public void RemoveHitbox(IHitbox hitbox)
+        {
+            TriggerAreas.Remove(hitbox);
+            OnHitboxDeletion?.Invoke(this, new HitboxEventArgs(hitbox));
+        }
+        public void ShowMenu(object sender, EventArgs e)
+        {
+            if (AccessModifierMenu == null)
+            {
+                MenuPrefab.Position = AccessModifierButton.Position + new Vector(AccessModifierButton.Width, 0);
+                AccessModifierMenu = MenuPrefab;
+                Children.Add(AccessModifierMenu);
+                OnFocused?.Invoke(this, new NodeEventArgs(this));
+                AddHitbox(AccessModifierMenu.TriggerAreas[0]);
+            }
+            else
+                OnMenuHide?.Invoke(this, e);
+        }
+        public void HideMenu(object sender, EventArgs e)
+        {
+            if (AccessModifierMenu != null)
+                Children.Remove(AccessModifierMenu);
+            AccessModifierMenu = null;
+        }
+        public void ShowOptions(object sender, EventArgs e)
+        {
+            if (OptionsMenu == null)
+            {
+                OptionsMenu = OptionsPrefab;
+                AddHitbox(OptionsMenu.TriggerAreas[0]);
+                Children.Add(OptionsMenu);
+                OnFocused?.Invoke(this, new NodeEventArgs(this));
+                AddHitbox(OptionsMenu.TriggerAreas[0]);
+            }
+            else
+                OnOptionsHide?.Invoke(this, e);
+        }
+        public void HideOptions(object sender, EventArgs e)
+        {
+            if(OptionsMenu != null)
+                Children.Remove(OptionsMenu);
+            OptionsMenu = null;
+        }
+        public EventHandler OnOptionsShow { get; set; }
+        public EventHandler OnOptionsHide { get; set; }
+        public EventHandler OnMenuShow { get; set; }
+        public EventHandler OnMenuHide { get; set; }
+        public EventHandler<HitboxEventArgs> OnHitboxCreation { get; set; }
+        public EventHandler<HitboxEventArgs> OnHitboxDeletion { get; set; }
     }
 }

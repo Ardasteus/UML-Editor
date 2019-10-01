@@ -7,8 +7,8 @@ using System.Windows.Forms;
 
 namespace UML_Editor.Nodes
 {
-    public interface IKeyboardHandlerNode : IHandlerNode
+    public interface IKeyboardFocusableNode : IFocusableNode
     {
-        void HandleKey(char key);
+        EventHandler<KeyPressEventArgs> OnKeyPress { get; set; }
     }
 }

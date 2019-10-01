@@ -7,26 +7,26 @@ using UML_Editor.Nodes;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
-using UML_Editor.Others;
+using UML_Editor.Hitboxes;
 using UML_Editor.Geometry;
 using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Relationships
 {
-    public class Relationship : IContainerNode, IOptionsNode
+    public class Relationship //: IContainerNode, IOptionsNode
     {
         public RelationshipSegment Origin { get; set; }
         public RelationshipSegment Target { get; set; }
         public string Name { get; set; }
         public Vector Position { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
         public List<IHitbox> TriggerAreas { get; set; }
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
         public EventHandler OnFocused { get; set; }
         public EventHandler OnUnfocused { get; set; }
-        public ContextMenuNode OptionsPrefab { get; set; }
-        public ContextMenuNode OptionsMenu { get; set; }
+        public BasicContainerNode OptionsPrefab { get; set; }
+        public BasicContainerNode OptionsMenu { get; set; }
         public bool isFocused { get; set; }
 
         private ClassDiagramNode OriginNode;
@@ -114,16 +114,19 @@ namespace UML_Editor.Relationships
                 Children.Add(OptionsMenu);
             return Children;
         }
+
+        public IFocusableNode FocusedNode { get; set; }
+
         public void GeneratePrefab()
         {
-            OptionsPrefab = new ContextMenuNode("cnt", Vector.Zero, 0, 0, RectangleRenderElementStyle.Default);
-            OptionsPrefab.AddNode(new ButtonNode("btn1", "Test", Vector.Zero, Renderer.GetTextWidth(12), Renderer.SingleTextHeight, () =>
-            {
-                OptionsMenu = null;
-                TriggerAreas.RemoveAt(1);
-                GeneratePrefab();
-            },
-            RectangleRenderElementStyle.Default));
+            //OptionsPrefab = new BasicContainerNode("cnt", Vector.Zero, 0, 0, RectangleRenderElementStyle.Default);
+            //OptionsPrefab.AddNode(new ButtonNode("btn1", "Test", Vector.Zero, Renderer.GetTextWidth(12), Renderer.SingleTextHeight, () =>
+            //{
+            //    OptionsMenu = null;
+            //    TriggerAreas.RemoveAt(1);
+            //    GeneratePrefab();
+            //},
+            //RectangleRenderElementStyle.Default));
         }
 
         public void ShowOptionsMenu()
@@ -140,8 +143,9 @@ namespace UML_Editor.Relationships
             }
         }
 
-        public void HandleMouse()
-        {
-        }
+        public EventHandler OnOptionsShow { get; set; }
+        public EventHandler OnOptionsHide { get; set; }
+
+        public EventHandler OnMouseClick { get; set; }
     }
 }

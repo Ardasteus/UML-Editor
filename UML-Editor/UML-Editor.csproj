@@ -47,10 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EditorControler.cs" />
-    <Compile Include="CodeGenerating\CodeGenerator.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Enums\AccessModifiers.cs" />
     <Compile Include="Enums\Modifiers.cs" />
+    <Compile Include="EventArguments\NodeEventArgs.cs" />
+    <Compile Include="EventArguments\CodeStructureEventArgs.cs" />
+    <Compile Include="EventArguments\OptionsMenuEventArgs.cs" />
+    <Compile Include="EventArguments\TextEventArgs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,33 +62,33 @@
     </Compile>
     <Compile Include="Geometry\Line.cs" />
     <Compile Include="Geometry\Šafránková.cs" />
+    <Compile Include="NodeStructure\BasicNodeStructure.cs" />
+    <Compile Include="NodeStructure\BasicTextNodeStructure.cs" />
+    <Compile Include="NodeStructure\ButtonStructure.cs" />
+    <Compile Include="Nodes\BasicContainerNode.cs" />
+    <Compile Include="Nodes\BasicNode.cs" />
+    <Compile Include="Nodes\LabelNode.cs" />
     <Compile Include="Nodes\ButtonNode.cs" />
     <Compile Include="Nodes\ClassDiagramNode.cs" />
-    <Compile Include="Nodes\ContextMenuNode.cs" />
-    <Compile Include="Nodes\FeatureNode.cs" />
+    <Compile Include="Nodes\PropertyNode.cs" />
     <Compile Include="Nodes\Interfaces\IContainerNode.cs" />
-    <Compile Include="Nodes\Interfaces\IHandlerNode.cs" />
+    <Compile Include="Nodes\Interfaces\IFocusableNode.cs" />
     <Compile Include="Nodes\Interfaces\IKeyboardHandlerNode.cs" />
     <Compile Include="Nodes\Interfaces\IMouseHandlerNode.cs" />
     <Compile Include="Nodes\Interfaces\INode.cs" />
     <Compile Include="Nodes\Interfaces\IOptionsNode.cs" />
-    <Compile Include="Nodes\Interfaces\IRelationshipMemberNode.cs" />
-    <Compile Include="Nodes\Interfaces\IRelationshipNode.cs" />
     <Compile Include="Nodes\Interfaces\IRenderableNode.cs" />
-    <Compile Include="Nodes\LabelNode.cs" />
+    <Compile Include="Nodes\Interfaces\ITextNode.cs" />
     <Compile Include="Nodes\MethodNode.cs" />
-    <Compile Include="Nodes\PropertyNode.cs" />
     <Compile Include="Nodes\TextBoxNode.cs" />
-    <Compile Include="Nodes\UMLDiagram.cs" />
-    <Compile Include="Others\DiagramRemovalEventArgs.cs" />
-    <Compile Include="Others\EditorChangeEventArgs.cs" />
-    <Compile Include="Others\FeatureRemovalEventArgs.cs" />
-    <Compile Include="Others\HitboxEventArgs.cs" />
-    <Compile Include="Others\IHitbox.cs" />
-    <Compile Include="Others\PositionEventArgs.cs" />
-    <Compile Include="Others\RectangleHitbox.cs" />
-    <Compile Include="Others\ResizeEventArgs.cs" />
+    <Compile Include="EventArguments\EditorChangeEventArgs.cs" />
+    <Compile Include="EventArguments\HitboxEventArgs.cs" />
+    <Compile Include="Hitboxes\IHitbox.cs" />
+    <Compile Include="EventArguments\PositionEventArgs.cs" />
+    <Compile Include="Hitboxes\RectangleHitbox.cs" />
+    <Compile Include="EventArguments\ResizeEventArgs.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProjectStructure\BasicCodeStructure.cs" />
     <Compile Include="ProjectStructure\BasicStructure.cs" />
     <Compile Include="ProjectStructure\ClassStructure.cs" />
     <Compile Include="ProjectStructure\MethodStructure.cs" />
@@ -131,6 +134,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Application\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

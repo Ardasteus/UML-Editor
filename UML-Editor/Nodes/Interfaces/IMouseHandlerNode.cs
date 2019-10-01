@@ -1,14 +1,15 @@
-﻿     using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UML_Editor.Others;
+using UML_Editor.Hitboxes;
+using System.Windows.Forms;
 
 namespace UML_Editor.Nodes
 {
-    public interface IMouseHandlerNode : IHandlerNode
+    public interface IMouseFocusableNode : IFocusableNode
     {
-        void HandleMouse();
+        EventHandler OnMouseClick { get; set; }
     }
 }

@@ -8,27 +8,12 @@ using UML_Editor.Geometry;
 
 namespace UML_Editor.ProjectStructure
 {
-    public class MethodStructure : BasicStructure
+    public class MethodStructure : BasicCodeStructure
     {
-        public AccessModifiers AccessModifier { get; set; }
-        public Modifiers Modifier { get; set; }
         public string Arguments { get; set; }
-        public MethodStructure(Vector position, string name, string type, AccessModifiers accessModifier, Modifiers modifier, string arguments) : base(position, name)
+        public MethodStructure(Vector position, string name, string type, string arguments, AccessModifiers accessModifier, Modifiers modifier) : base(position, name, type, accessModifier, modifier)
         {
-            Name = name;
-            Type = type;
-            AccessModifier = accessModifier;
-            Modifier = modifier;
             Arguments = arguments;
         }
-        public MethodStructure(Vector position, string name, string type, AccessModifiers accessModifier, Modifiers modifier) : base(position, name)
-        {
-            Name = name;
-            Type = type;
-            AccessModifier = accessModifier;
-            Modifier = modifier;
-            Arguments = "" ;
-        }
-        public string Type { get; set; }
     }
 }

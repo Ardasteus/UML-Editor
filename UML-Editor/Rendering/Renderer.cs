@@ -14,8 +14,8 @@ namespace UML_Editor.Rendering
     {
         private PictureBox plane;
         public Vector Origin { get; set; }
-        private int width;
-        private int height;
+        private float width;
+        private float height;
         public Color ClearColor = Color.Transparent;
         public float Scale { get; set; } = 1f;
         public Renderer(PictureBox pic)
@@ -25,12 +25,6 @@ namespace UML_Editor.Rendering
             height = plane.Height;
             Origin = new Vector(width / 2, height / 2);
         }
-
-        public void DrawPixer(Vector p, Pen draw_pen)
-        {
-
-        }
-
         public void DrawLine(Vector from, Vector to, Pen draw_pen)
         {
             using (Graphics g = GetGraphics())
@@ -40,14 +34,9 @@ namespace UML_Editor.Rendering
             }
         }
 
-        public void DrawElipse(Vector position, int width, int height, Pen draw_pen, Brush fill_brush = null)
+        public void DrawRectangle(Vector position, float width, float height, Pen draw_pen, Brush fill_brush = null)
         {
-
-        }
-
-        public void DrawRectangle(Vector position, int width, int height, Pen draw_pen, Brush fill_brush = null)
-        {
-            Rectangle rect = new Rectangle((int)(position.X + Origin.X), (int)(position.Y + Origin.Y), width, height);
+            Rectangle rect = new Rectangle((int)(position.X + Origin.X), (int)(position.Y + Origin.Y), (int)width, (int)height);
             using (Graphics g = GetGraphics())
             {
                 g.ScaleTransform(Scale, Scale);
@@ -88,11 +77,6 @@ namespace UML_Editor.Rendering
         public static int GetTextWidth(int text_length)
         {
             return 13 + (text_length - 1) * 9;
-        }
-        public static int GetTextHeight(int lines)
-        {
-            int r = 18 + (lines - 1) * 15;
-            return r;
         }
         public void Resize()
         {
