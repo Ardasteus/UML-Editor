@@ -86,7 +86,6 @@
     <Compile Include="Others\RectangleHitbox.cs" />
     <Compile Include="Others\ResizeEventArgs.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProjectStructure\ArgumentStructure.cs" />
     <Compile Include="ProjectStructure\BasicStructure.cs" />
     <Compile Include="ProjectStructure\ClassStructure.cs" />
     <Compile Include="ProjectStructure\MethodStructure.cs" />

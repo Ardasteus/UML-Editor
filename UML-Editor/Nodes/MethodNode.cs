@@ -38,8 +38,9 @@ namespace UML_Editor.Nodes
         public TextBoxNode ArgumentsTextBox { get; set; }
         public LabelNode LeftBracket { get; set; }
         public LabelNode RightBracket { get; set; }
-        public MethodNode(Vector position, MethodStructure structure) : base()
+        public MethodNode(MethodStructure structure) : base()
         {
+            Vector position = structure.Position;
             Structure = structure;
             AccessModifier = Structure.AccessModifier;
             Modifier = Structure.Modifier;

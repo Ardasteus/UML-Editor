@@ -56,8 +56,9 @@ namespace UML_Editor.Nodes
             }
         }
 
-        public PropertyNode(Vector position, PropertyStructure structure) : base()
+        public PropertyNode(PropertyStructure structure) : base()
         {
+            Vector position = structure.Position;
             Structure = structure;
             AccessModifier = Structure.AccessModifier;
             Modifier = Structure.Modifier;

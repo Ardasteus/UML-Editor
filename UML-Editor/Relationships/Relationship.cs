@@ -81,7 +81,7 @@ namespace UML_Editor.Relationships
                 Values.Add(OriginNode.GetTopAnchor());
             else if (Šafránková.Intersect(CntrLine, OriginNode.GetLeftSide()))
                 Values.Add(OriginNode.GetLeftAnchor());
-            else if (Šafránková.Intersect(CntrLine, OriginNode.GetBotSide()))
+            else
                 Values.Add(OriginNode.GetBotAnchor());
 
             if (Šafránková.Intersect(CntrLine, TargetNode.GetRightSide()))
@@ -90,7 +90,7 @@ namespace UML_Editor.Relationships
                 Values.Add(TargetNode.GetTopAnchor());
             else if (Šafránková.Intersect(CntrLine, TargetNode.GetLeftSide()))
                 Values.Add(TargetNode.GetLeftAnchor());
-            else if (Šafránková.Intersect(CntrLine, TargetNode.GetBotSide()))
+            else
                 Values.Add(TargetNode.GetBotAnchor());
 
             Values.Add((Values[0] + Values[1]) / 2);

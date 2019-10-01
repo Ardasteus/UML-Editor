@@ -21,30 +21,26 @@ namespace UML_Editor.CodeGenerating
         Project Project;
         public CodeGenerator(string output, Project project)
         {
-            Output = output;
-            TargetUnit = new CodeCompileUnit();
-            TargetClass = new CodeTypeDeclaration(class_node.NameTextBox.Text);
-            ClassNode = class_node;
         }
 
         public bool GenerateClass()
         {
            // try
             //{
-                CodeNamespace Namespaces = new CodeNamespace("Uml_Editor_Generated");
-                Namespaces.Imports.Add(new CodeNamespaceImport("System"));
-                TargetClass.IsClass = true;
-                TargetClass.TypeAttributes = TypeAttributes.Public;
-                Namespaces.Types.Add(TargetClass);
-                TargetUnit.Namespaces.Add(Namespaces);
-                foreach (PropertyNode item in ClassNode.Properties)
-                {
-                    AddProperty(item);
-                }
-                foreach (MethodNode item in ClassNode.Methods)
-                {
-                    AddMethod(item);
-                }
+                //CodeNamespace Namespaces = new CodeNamespace("Uml_Editor_Generated");
+                //Namespaces.Imports.Add(new CodeNamespaceImport("System"));
+                //TargetClass.IsClass = true;
+                //TargetClass.TypeAttributes = TypeAttributes.Public;
+                //Namespaces.Types.Add(TargetClass);
+                //TargetUnit.Namespaces.Add(Namespaces);
+                //foreach (PropertyNode item in ClassNode.Properties)
+                //{
+                //    AddProperty(item);
+                //}
+                //foreach (MethodNode item in ClassNode.Methods)
+                //{
+                //    AddMethod(item);
+                //}
             GenerateConstructor();
             GenerateCode();
                 return true;

@@ -69,8 +69,9 @@ namespace UML_Editor.Nodes
         public bool isFocused { get; set; }
         public EventHandler<PositionEventArgs> OnPositionChanged { get; set; }
 
-        public ClassDiagramNode(Vector position, ClassStructure structure)
+        public ClassDiagramNode(ClassStructure structure)
         {
+            Vector position = structure.Position;
             Structure = structure;
             BorderElement = new RectangleRenderElement(position, Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight, Color.White, Color.Black);
             TriggerAreas.Add(new RectangleHitbox(position, Renderer.GetTextWidth(structure.Name.Length), Renderer.SingleTextHeight));
@@ -83,7 +84,7 @@ namespace UML_Editor.Nodes
 
         public void AddProperty(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
         {
-            PropertyNode new_prop = new PropertyNode(Position + new Vector(0, (Properties.Count + 1) * Renderer.SingleTextHeight), new PropertyStructure(name, type, accessModifier, modifier));
+            PropertyNode new_prop = new PropertyNode(new PropertyStructure(Position + new Vector(0, (Properties.Count + 1) * Renderer.SingleTextHeight), name, type, accessModifier, modifier));
             new_prop.OnResize = Resize;
             new_prop.OnFocused = OnFeatureFocused;
             new_prop.OnUnfocused = OnFeatureUnfocused;
@@ -96,7 +97,7 @@ namespace UML_Editor.Nodes
         }
         public void AddMethod(string name, string type, AccessModifiers accessModifier, Modifiers modifier)
         {
-            MethodNode new_method = new MethodNode(Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), new MethodStructure(name, type, accessModifier, modifier));
+            MethodNode new_method = new MethodNode(new MethodStructure(Position + new Vector(0, (Methods.Count + Properties.Count + 1) * Renderer.SingleTextHeight), name, type, accessModifier, modifier));
             new_method.OnResize = Resize;
             new_method.OnFocused = OnFeatureFocused;
             new_method.OnUnfocused = OnFeatureUnfocused;

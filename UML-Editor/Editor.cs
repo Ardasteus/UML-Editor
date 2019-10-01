@@ -37,7 +37,7 @@ namespace UML_Editor
         {
             Project = new Project(ProjectName);
             Renderer = new Renderer(renderTarget);
-            AddDiagram(Vector.Zero, new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None));
+            AddDiagram(new ClassStructure(Vector.Zero, "NewClass", AccessModifiers.Public, Modifiers.None));
             ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddMethod("Method", "void", AccessModifiers.Public, Modifiers.None);
             ((ClassDiagramNode)Diagrams[0]).AddProperty("Prop", "String", AccessModifiers.Public, Modifiers.None);
@@ -60,9 +60,9 @@ namespace UML_Editor
             Renderer.Clear();
         }
 
-        public void AddDiagram(Vector position, ClassStructure structure)
+        public void AddDiagram(ClassStructure structure)
         {
-            ClassDiagramNode node = new ClassDiagramNode(position, structure);
+            ClassDiagramNode node = new ClassDiagramNode(structure);
             Project.AddClass(structure);
             Diagrams.Add(node);
             node.OnRemoval += OnDiagramRemoval;
@@ -371,7 +371,7 @@ namespace UML_Editor
             OptionsPrefab = new ContextMenuNode("cnt", mouse_positon, 0, 0, RectangleRenderElementStyle.Default);
             OptionsPrefab.AddNode(new ButtonNode("btn1", "Add a Diagram", mouse_positon, Renderer.GetTextWidth(13), Renderer.SingleTextHeight, () =>
             {
-                AddDiagram(mouse_positon, new ClassStructure("NewClass", AccessModifiers.Public, Modifiers.None));
+                AddDiagram(new ClassStructure(mouse_positon, "NewClass", AccessModifiers.Public, Modifiers.None));
                 OptionsMenu = null;
             },
             RectangleRenderElementStyle.Default));
@@ -393,8 +393,8 @@ namespace UML_Editor
         {
             foreach (ClassDiagramNode classNode in Diagrams.OfType<ClassDiagramNode>())
             {
-                CodeGenerator generator = new CodeGenerator("D:\\Testing\\" + classNode.NameTextBox.Text + ".cs", classNode);
-                generator.GenerateClass();
+                //CodeGenerator generator = new CodeGenerator("D:\\Testing\\" + classNode.NameTextBox.Text + ".cs", classNode);
+                //generator.GenerateClass();
             }
         }
 
