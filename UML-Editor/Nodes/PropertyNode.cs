@@ -42,7 +42,6 @@ namespace UML_Editor.Nodes
             OnUnfocused += OnUnFocus;
             GenerateMenu();
             GenerateOptions();
-            SetEvents();
         }
 
         public void SetEvents()
@@ -58,9 +57,12 @@ namespace UML_Editor.Nodes
             Children.ForEach(x => x.OnResize += OnChildResize);
             Children.OfType<IFocusableNode>().ToList().ForEach(x =>
             {
-                x.OnFocused += HideMenu;
-                x.OnFocused += HideOptions;
-                x.OnFocused += OnNodeFocus;
+                if(!(x is ButtonNode))
+                {
+                    x.OnFocused += HideMenu;
+                    x.OnFocused += HideOptions;
+                    x.OnFocused += OnNodeFocus;
+                }
                 x.OnUnfocused += OnNodeUnfocus;
             });
         }
@@ -121,7 +123,8 @@ namespace UML_Editor.Nodes
         }
         public override void OnNodeFocus(object sender, NodeEventArgs e)
         {
-            if (FocusedNode != e.Node)
+            OnFocused?.Invoke(this, new NodeEventArgs(this));
+            if (FocusedNode != e.Node && !(e.Node is ButtonNode))
             {
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
@@ -132,6 +135,8 @@ namespace UML_Editor.Nodes
         {
             if (FocusedNode == e.Node)
                 FocusedNode = null;
+            if (AccessModifierMenu == null && OptionsMenu == null)
+                OnUnfocused?.Invoke(this, new NodeEventArgs(this));
         }
         public override void RepositionChildren()
         {
@@ -231,7 +236,6 @@ namespace UML_Editor.Nodes
             MenuPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Public", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     AccessModifier = AccessModifiers.Public;
-                    RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
                     OnMenuHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -239,7 +243,6 @@ namespace UML_Editor.Nodes
             MenuPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Private", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     AccessModifier = AccessModifiers.Private;
-                    RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
                     OnMenuHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -247,7 +250,6 @@ namespace UML_Editor.Nodes
             MenuPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Protected", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     AccessModifier = AccessModifiers.Protected;
-                    RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
                     OnMenuHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -275,13 +277,14 @@ namespace UML_Editor.Nodes
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
                 AddHitbox(AccessModifierMenu.TriggerAreas[0]);
             }
-            else
-                OnMenuHide?.Invoke(this, e);
         }
         public void HideMenu(object sender, EventArgs e)
         {
             if (AccessModifierMenu != null)
+            {
+                RemoveHitbox(AccessModifierMenu.TriggerAreas[0]);
                 Children.Remove(AccessModifierMenu);
+            }
             AccessModifierMenu = null;
         }
         public void ShowOptions(object sender, EventArgs e)
@@ -300,7 +303,10 @@ namespace UML_Editor.Nodes
         public void HideOptions(object sender, EventArgs e)
         {
             if(OptionsMenu != null)
+            {
+                RemoveHitbox(OptionsMenu.TriggerAreas[0]);
                 Children.Remove(OptionsMenu);
+            }
             OptionsMenu = null;
         }
         public EventHandler OnOptionsShow { get; set; }

@@ -68,9 +68,12 @@ namespace UML_Editor.Nodes
                 Methods.Add(mn);
                 mn.OnHitboxCreation += AddHitbox;
                 mn.OnHitboxDeletion += RemoveHitbox;
+                mn.OnUnfocused += OnNodeUnfocus;
+                mn.OnFocused += OnNodeFocus;
                 CodeStructure.Methods.Add(mn.CodeStructure);
                 Height += Renderer.SingleTextHeight;
                 mn.RepositionChildren();
+                mn.SetEvents();
                 base.AddNode(node);
             }
             else if (node is PropertyNode pn)
@@ -78,9 +81,12 @@ namespace UML_Editor.Nodes
                 Properties.Add(pn);
                 pn.OnHitboxCreation += AddHitbox;
                 pn.OnHitboxDeletion += RemoveHitbox;
+                pn.OnUnfocused += OnNodeUnfocus;
+                pn.OnFocused += OnNodeFocus;
                 CodeStructure.Properties.Add(pn.CodeStructure);
                 Height += Renderer.SingleTextHeight;
                 pn.RepositionChildren();
+                pn.SetEvents();
                 base.AddNode(node);
             }
         }

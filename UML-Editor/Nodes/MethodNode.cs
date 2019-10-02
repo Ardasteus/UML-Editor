@@ -40,9 +40,8 @@ namespace UML_Editor.Nodes
             Children.Add(LeftBracket);
             Children.Add(RightBracket);
             Children.Add(ArgumentsTextBox);
-            ArgumentsTextBox.OnFocused += HideMenu;
-            ArgumentsTextBox.OnFocused += HideOptions;
-            SetEvents();
+            GenerateMenu();
+            GenerateOptions();
         }
 
         public override float GetWidth()
