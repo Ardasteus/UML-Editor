@@ -24,8 +24,8 @@ namespace UML_Editor.CodeGeneration
             string Arguments = "";
             foreach (PropertyStructure prop in Properties)
             {
-                Arguments += prop.Name + " ";
-                Arguments += prop.Type + ", ";
+                Arguments += prop.Type + " ";
+                Arguments += prop.Name.ToLower() + ", ";
             }
 
             if (Arguments.Length > 1)
@@ -33,6 +33,10 @@ namespace UML_Editor.CodeGeneration
             string line = "        public " + Class.Name + "(" + Arguments + ")";
             Lines.Add(line);
             Lines.Add("        {");
+            foreach (PropertyStructure prop in Properties)
+            {
+                Lines.Add("        " + prop.Name + " = " + prop.Name.ToLower() + ";");
+            }
             Lines.Add("        }");
         }
     }
