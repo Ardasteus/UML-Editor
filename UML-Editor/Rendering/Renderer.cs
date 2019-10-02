@@ -33,7 +33,6 @@ namespace UML_Editor.Rendering
                 g.DrawLine(draw_pen, from + Origin, to + Origin);
             }
         }
-
         public void DrawRectangle(Vector position, float width, float height, Pen draw_pen, Brush fill_brush = null)
         {
             Rectangle rect = new Rectangle((int)(position.X + Origin.X), (int)(position.Y + Origin.Y), (int)width, (int)height);

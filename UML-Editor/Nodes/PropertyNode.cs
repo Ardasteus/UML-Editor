@@ -133,8 +133,6 @@ namespace UML_Editor.Nodes
         {
             if (FocusedNode == e.Node)
                 FocusedNode = null;
-            if (AccessModifierMenu == null && OptionsMenu == null)
-                OnUnfocused?.Invoke(this, new NodeEventArgs(this));
         }
         public override void RepositionChildren()
         {

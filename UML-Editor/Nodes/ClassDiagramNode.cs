@@ -42,6 +42,7 @@ namespace UML_Editor.Nodes
         {
             OnOptionsShow += ShowOptions;
             OnOptionsHide += HideOptions;
+            OnUnfocused += OnUnFocus;
             OnChange += HideOptions;
             Children.ForEach(x => x.OnResize += OnChildResize);
             Children.OfType<IFocusableNode>().ToList().ForEach(x =>
@@ -169,10 +170,14 @@ namespace UML_Editor.Nodes
             if (FocusedNode != e.Node)
             {
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
-                OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
                 FocusedNode = (IFocusableNode)e.Node;
             }
+        }
+        public void OnUnFocus(object sender, NodeEventArgs e)
+        {
+            FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+            OnOptionsHide?.Invoke(this, EventArgs.Empty);
         }
         public override void OnNodeUnfocus(object sender, NodeEventArgs e)
         {
