@@ -44,6 +44,12 @@ namespace UML_Editor.Nodes
             GenerateOptions();
         }
 
+        public virtual void UpdateStructure(object sender, EventArgs e)
+        {
+            CodeStructure.Name = NameTextBox.Text;
+            CodeStructure.Type = TypeTextBox.Text;
+        }
+
         public void SetEvents()
         {
             OnMenuHide += HideMenu;
@@ -54,6 +60,7 @@ namespace UML_Editor.Nodes
             OnMenuShow += HideOptions;
             OnChange += HideMenu;
             OnChange += HideOptions;
+            OnChange += UpdateStructure;
             Children.ForEach(x => x.OnResize += OnChildResize);
             Children.OfType<IFocusableNode>().ToList().ForEach(x =>
             {
@@ -136,9 +143,7 @@ namespace UML_Editor.Nodes
         }
         public override void RepositionChildren()
         {
-            float new_width = GetWidth();
-            if (Width < new_width)
-                Width = new_width;
+            Width = GetWidth();
             if (Height != Renderer.SingleTextHeight)
                 Height = Renderer.SingleTextHeight;
             AccessModifierButton.Position = new Vector(Position.X, Position.Y);

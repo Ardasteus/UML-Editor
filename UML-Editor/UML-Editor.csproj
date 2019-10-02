@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneration\BaseGenerator.cs" />
+    <Compile Include="CodeGeneration\ClassGenerator.cs" />
+    <Compile Include="CodeGeneration\ConstructorGenerator.cs" />
+    <Compile Include="CodeGeneration\CodeGenerator.cs" />
+    <Compile Include="CodeGeneration\MethodGenerator.cs" />
+    <Compile Include="CodeGeneration\PropertyGenerator.cs" />
     <Compile Include="EditorControler.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="Enums\AccessModifiers.cs" />
@@ -134,8 +140,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Application\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

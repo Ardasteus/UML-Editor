@@ -24,6 +24,7 @@ namespace UML_Editor.Relationships
                 else if(node != value)
                 {
                     CreateRelationship(node, value);
+                    IsCreating = false;
                     node = null;
                 }
             }

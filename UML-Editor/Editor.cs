@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
+using UML_Editor.CodeGeneration;
 using UML_Editor.Rendering;
 using UML_Editor.Nodes;
 using UML_Editor.Rendering.ElementStyles;
@@ -280,7 +281,7 @@ namespace UML_Editor
         private void GeneratePrefab()
         {
             float total_Width = Renderer.GetTextWidth(21);
-            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 2), RectangleRenderElementStyle.Default);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Add a Diagram", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     AddDiagram(new ClassStructure(LastMousePos, "NewClass", "class", AccessModifiers.Public, Modifiers.None));
@@ -291,6 +292,14 @@ namespace UML_Editor
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Relationship", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     RelationshipManager.IsCreating = true;
+                    OptionsMenu = null;
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Generate Code", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    CodeGenerator generator = new CodeGenerator(Project, "D:\\Testing");
+                    generator.Generate();
                     OptionsMenu = null;
                 }),
                 RectangleRenderElementStyle.Default,

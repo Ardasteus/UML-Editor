@@ -36,8 +36,7 @@ namespace UML_Editor.Nodes
             {
                 Structure.Text = value;
                 TextElement.Text = value;
-                if (Renderer.GetTextWidth(value.Length) > Width)
-                    Width = Renderer.GetTextWidth(value.Length);
+                Width = Renderer.GetTextWidth(value.Length);
                 OnTextChange?.Invoke(this, new TextEventArgs(Text));
                 OnChange?.Invoke(this, EventArgs.Empty);
             }

@@ -30,7 +30,7 @@ namespace UML_Editor.Nodes
         public ClassDiagramNode(ClassStructure codestructure, BasicNodeStructure structure, RectangleRenderElementStyle border_style) : base(structure, border_style)
         {
             CodeStructure = codestructure;
-            NameTextBox = new TextBoxNode(new BasicTextNodeStructure(Position, Renderer.GetTextWidth(Name.Length), Height, Name), TextRenderElementStyle.Default, RectangleRenderElementStyle.Textbox);
+            NameTextBox = new TextBoxNode(new BasicTextNodeStructure(Position, Renderer.GetTextWidth(Name.Length), Renderer.SingleTextHeight, Name), TextRenderElementStyle.Default, RectangleRenderElementStyle.Textbox);
             NameLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             SeparatorLine = new LineRenderElement(new Vector(Position.X, Position.Y + Renderer.SingleTextHeight), new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight), 1, Color.Black);
             Children.Add(NameTextBox);
@@ -38,12 +38,18 @@ namespace UML_Editor.Nodes
             RepositionChildren();
             SetEvents();
         }
+        public void UpdateStructure(object sender, EventArgs e)
+        {
+            CodeStructure.Name = NameTextBox.Text;
+        }
         public void SetEvents()
         {
             OnOptionsShow += ShowOptions;
             OnOptionsHide += HideOptions;
             OnUnfocused += OnUnFocus;
             OnChange += HideOptions;
+            OnChange += UpdateStructure;
+            //OnChange += (sender, args) => OnUnFocus(this, new NodeEventArgs(this)); 
             Children.ForEach(x => x.OnResize += OnChildResize);
             Children.OfType<IFocusableNode>().ToList().ForEach(x =>
             {
@@ -140,17 +146,19 @@ namespace UML_Editor.Nodes
         }
         public override void RepositionChildren()
         {
-            float new_width = GetWidest();
-            if (Width < new_width)
-                Width = new_width;
+            Width = GetWidest();
             NameTextBox.Position = new Vector((Position.X + Width / 2) - (NameTextBox.Width / 2), Position.Y);
             for (int i = 0; i < Properties.Count; i++)
             {
-                Properties[i].Position = Position + new Vector(0, (i + 1) * Renderer.SingleTextHeight);
+                Vector newpos = Position + new Vector(0, (i + 1) * Renderer.SingleTextHeight);
+                if(Properties[i].Position != newpos)
+                    Properties[i].Position = newpos;
             }
             for (int i = 0; i < Methods.Count; i++)
             {
-                Methods[i].Position = Position + new Vector(0, (i + Properties.Count + 1) * Renderer.SingleTextHeight);
+                Vector newpos = Position + new Vector(0, (i + Properties.Count + 1) * Renderer.SingleTextHeight);
+                if (Methods[i].Position != newpos)
+                    Methods[i].Position = newpos;
             }
             NameLine.StartPoint = new Vector(Position.X, Position.Y + Renderer.SingleTextHeight);
             NameLine.EndPoint = new Vector(Position.X + Width, Position.Y + Renderer.SingleTextHeight);

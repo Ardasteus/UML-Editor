@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -44,6 +45,13 @@ namespace UML_Editor.Nodes
             GenerateOptions();
         }
 
+        public override void UpdateStructure(object sender, EventArgs e)
+        {
+            CodeStructure.Name = NameTextBox.Text;
+            CodeStructure.Type = TypeTextBox.Text;
+            CodeStructure.Arguments = ArgumentsTextBox.Text;
+        }
+
         public override float GetWidth()
         {
             return AccessModifierButton.Width + NameTextBox.Width + Separator.Width + TypeTextBox.Width + LeftBracket.Width + RightBracket.Width + ArgumentsTextBox.Width;
@@ -51,9 +59,7 @@ namespace UML_Editor.Nodes
 
         public override void RepositionChildren()
         {
-            float new_width = GetWidth();
-            if (Width < new_width)
-                Width = new_width;
+            Width = GetWidth();
             AccessModifierButton.Position = new Vector(Position.X, Position.Y);
             NameTextBox.Position = Position + new Vector(AccessModifierButton.Width, 0);
             ArgumentsTextBox.Position = Position + new Vector(AccessModifierButton.Width + NameTextBox.Width + LeftBracket.Width, 0);
