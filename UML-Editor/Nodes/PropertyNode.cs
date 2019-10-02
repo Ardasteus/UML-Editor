@@ -200,7 +200,7 @@ namespace UML_Editor.Nodes
         public virtual void GenerateOptions()
         {
             float total_Width = Renderer.GetTextWidth(13);
-            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 4), RectangleRenderElementStyle.Default);
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Regular", total_Width, Renderer.SingleTextHeight , () =>
                 {
                     Modifier = Modifiers.None;
@@ -218,6 +218,13 @@ namespace UML_Editor.Nodes
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     Modifier = Modifiers.Static;
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Remove", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    OnRemoval?.Invoke(this, new NodeEventArgs(this));
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -287,7 +294,6 @@ namespace UML_Editor.Nodes
             if (OptionsMenu == null)
             {
                 OptionsMenu = OptionsPrefab;
-                AddHitbox(OptionsMenu.TriggerAreas[0]);
                 PrependNode(OptionsMenu);
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
                 AddHitbox(OptionsMenu.TriggerAreas[0]);

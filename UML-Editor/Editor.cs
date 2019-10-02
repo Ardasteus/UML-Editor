@@ -67,11 +67,16 @@ namespace UML_Editor
         {
             ClassDiagramNode node = new ClassDiagramNode(structure, new BasicNodeStructure(structure.Position, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Default);
             node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
-            node.AddNode(new MethodNode(new MethodStructure(Vector.Zero, "Prop", "Type", "Name : Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
+            node.AddNode(new MethodNode(new MethodStructure(Vector.Zero, "Method", "Type", "Name : Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
             if (!Project.Classes.Contains(structure))
                 Project.AddClass(structure);
             Diagrams.Add(node);
-            //node.OnRemoval += OnDiagramRemoval;
+            node.OnRemoval += (sender, args) => RemoveDiagram((ClassDiagramNode) args.Node);
+        }
+
+        public void RemoveDiagram(ClassDiagramNode diagram)
+        {
+            Diagrams.Remove(diagram);
         }
 
         public void OnKeyPress(object sender, KeyPressEventArgs e)

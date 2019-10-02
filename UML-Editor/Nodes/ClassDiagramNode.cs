@@ -49,6 +49,7 @@ namespace UML_Editor.Nodes
                 x.OnFocused += OnNodeFocus;
                 x.OnFocused += HideOptions;
                 x.OnUnfocused += OnNodeUnfocus;
+                x.OnRemoval += (sender, args) => RemoveNode(args.Node);
             });
         }
         public virtual string Name
@@ -72,6 +73,7 @@ namespace UML_Editor.Nodes
                 mn.OnHitboxDeletion += RemoveHitbox;
                 mn.OnUnfocused += OnNodeUnfocus;
                 mn.OnFocused += OnNodeFocus;
+                mn.OnRemoval += (sender, args) => RemoveNode(args.Node);
                 CodeStructure.Methods.Add(mn.CodeStructure);
                 Height += Renderer.SingleTextHeight;
                 mn.RepositionChildren();
@@ -85,12 +87,29 @@ namespace UML_Editor.Nodes
                 pn.OnHitboxDeletion += RemoveHitbox;
                 pn.OnUnfocused += OnNodeUnfocus;
                 pn.OnFocused += OnNodeFocus;
+                pn.OnRemoval += (sender, args) => RemoveNode(args.Node);
                 CodeStructure.Properties.Add(pn.CodeStructure);
                 Height += Renderer.SingleTextHeight;
                 pn.RepositionChildren();
                 pn.SetEvents();
                 base.AddNode(node);
             }
+        }
+
+        public override void RemoveNode(INode node)
+        {
+            if (node is MethodNode mn)
+            {
+                Methods.Remove(mn);
+                CodeStructure.Methods.Remove(mn.CodeStructure);
+            }
+            else if (node is PropertyNode pn)
+            {
+                Properties.Remove(pn);
+                CodeStructure.Properties.Remove(pn.CodeStructure);
+            }
+            Height -= Renderer.SingleTextHeight;
+            base.RemoveNode(node);
         }
 
         public virtual AccessModifiers AccessModifier
@@ -164,24 +183,26 @@ namespace UML_Editor.Nodes
         {
             float total_Width = Renderer.GetTextWidth(13);
             OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
-            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Regular", total_Width, Renderer.SingleTextHeight, () =>
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Add Property", total_Width, Renderer.SingleTextHeight, () =>
                 {
-                    Modifier = Modifiers.None;
+                    AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Property", "String", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight),
+                        RectangleRenderElementStyle.Textbox));
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
                 TextRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Abstract", total_Width, Renderer.SingleTextHeight, () =>
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "AddMethod", total_Width, Renderer.SingleTextHeight, () =>
                 {
-                    Modifier = Modifiers.Abstract;
+                    AddNode(new MethodNode(new MethodStructure(Vector.Zero, "Method", "void", "", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight),
+                        RectangleRenderElementStyle.Textbox));
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
                 TextRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
-                {
-                    Modifier = Modifiers.Static;
-                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Remove", total_Width, Renderer.SingleTextHeight, () =>
+            {
+                OnRemoval?.Invoke(this, new NodeEventArgs(this));
+                OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
                 TextRenderElementStyle.Default));
@@ -219,7 +240,6 @@ namespace UML_Editor.Nodes
             if (OptionsMenu == null)
             {
                 OptionsMenu = OptionsPrefab;
-                AddHitbox(OptionsMenu.TriggerAreas[0]);
                 PrependNode(OptionsMenu);
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
