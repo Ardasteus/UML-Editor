@@ -32,6 +32,7 @@ namespace UML_Editor
         private ClassDiagramNode Dragged;
         private Vector DraggingVector;
         private Vector LastMousePos;
+        public string Directory = "C:\\Testing";
         public Editor(PictureBox renderTarget, string ProjectName)
         {
             Project = new Project(ProjectName);
@@ -298,7 +299,7 @@ namespace UML_Editor
                 TextRenderElementStyle.Default));
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Generate Code", total_Width, Renderer.SingleTextHeight, () =>
                 {
-                    CodeGenerator generator = new CodeGenerator(Project, "D:\\Testing");
+                    CodeGenerator generator = new CodeGenerator(Project, Directory);
                     generator.Generate();
                     OptionsMenu = null;
                 }),
