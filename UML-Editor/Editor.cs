@@ -185,9 +185,20 @@ namespace UML_Editor
             }
         }
 
-        private IFocusableNode GetLastFocusInHierarchy(ClassDiagramNode node)
+        private IFocusableNode GetLastFocusInHierarchy(INode node)
         {
-            return ((PropertyNode) node.FocusedNode).FocusedNode;
+            if (node is ClassDiagramNode cn)
+            {
+                if (cn.FocusedNode != null && cn.FocusedNode is TextBoxNode tb)
+                    return tb;
+                if (cn.FocusedNode != null && cn.FocusedNode is PropertyNode pn)
+                {
+                    if (pn.FocusedNode != null)
+                        return pn.FocusedNode;
+                    return pn;
+                }
+            }
+            return null;
         }
 
         private IFocusableNode SearchForClicked(INode parent_node, Vector mouse_position)
