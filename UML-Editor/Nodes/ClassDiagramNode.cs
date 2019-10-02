@@ -42,10 +42,12 @@ namespace UML_Editor.Nodes
         {
             OnOptionsShow += ShowOptions;
             OnOptionsHide += HideOptions;
+            OnChange += HideOptions;
+            Children.ForEach(x => x.OnResize += OnChildResize);
             Children.OfType<IFocusableNode>().ToList().ForEach(x =>
             {
-                x.OnFocused += HideOptions;
                 x.OnFocused += OnNodeFocus;
+                x.OnFocused += HideOptions;
                 x.OnUnfocused += OnNodeUnfocus;
             });
         }
@@ -148,6 +150,7 @@ namespace UML_Editor.Nodes
             if (FocusedNode != e.Node)
             {
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
+                OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
                 FocusedNode = (IFocusableNode)e.Node;
             }
@@ -189,6 +192,8 @@ namespace UML_Editor.Nodes
         public EventHandler<NodeEventArgs> OnUnfocused { get; set; }
         public EventHandler OnMouseClick { get; set; }
         public EventHandler<CodeStructureEventArgs> OnCodeStructureChange { get; set; }
+        public EventHandler<HitboxEventArgs> OnHitboxCreation { get; set; }
+        public EventHandler<HitboxEventArgs> OnHitboxDeletion { get; set; }
         public void AddHitbox(object sender, HitboxEventArgs e)
         {
             TriggerAreas.Add(e.Hitbox);
@@ -198,14 +203,27 @@ namespace UML_Editor.Nodes
         {
             TriggerAreas.Remove(e.Hitbox);
         }
+        public void AddHitbox(IHitbox hitbox)
+        {
+            TriggerAreas.Add(hitbox);
+            OnHitboxCreation?.Invoke(this, new HitboxEventArgs(hitbox));
+        }
+
+        public void RemoveHitbox(IHitbox hitbox)
+        {
+            TriggerAreas.Remove(hitbox);
+            OnHitboxDeletion?.Invoke(this, new HitboxEventArgs(hitbox));
+        }
         public void ShowOptions(object sender, EventArgs e)
         {
             if (OptionsMenu == null)
             {
                 OptionsMenu = OptionsPrefab;
-                TriggerAreas.Add(OptionsMenu.TriggerAreas[0]);
-                Children.Add(OptionsMenu);
+                AddHitbox(OptionsMenu.TriggerAreas[0]);
+                PrependNode(OptionsMenu);
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
+                FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                AddHitbox(OptionsMenu.TriggerAreas[0]);
             }
             else
                 OnOptionsHide?.Invoke(this, e);
@@ -214,8 +232,8 @@ namespace UML_Editor.Nodes
         {
             if (OptionsMenu != null)
             {
+                RemoveHitbox(OptionsMenu.TriggerAreas[0]);
                 Children.Remove(OptionsMenu);
-                TriggerAreas.Remove(OptionsMenu.TriggerAreas[0]);
             }
             OptionsMenu = null;
         }
@@ -223,12 +241,16 @@ namespace UML_Editor.Nodes
         public override void Render(Renderer renderer)
         {
             base.Render(renderer);
+            FocusedNode?.Render(renderer);
             SeparatorLine.Render(renderer);
             NameLine.Render(renderer);
+            if (FocusedNode != null && FocusedNode is PropertyNode pn)
+            {
+                pn.OptionsMenu?.Render(renderer);
+                pn.AccessModifierMenu?.Render(renderer);
+            }
             BorderElement.BorderOnly(renderer);
-            ((PropertyNode)FocusedNode)?.FocusedNode?.Render(renderer);
-            ((PropertyNode)FocusedNode)?.OptionsMenu?.Render(renderer);
-            ((PropertyNode)FocusedNode)?.AccessModifierMenu?.Render(renderer);
+            OptionsMenu?.Render(renderer);
         }
 
         public bool IsOnEdge(Vector v)

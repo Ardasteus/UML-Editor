@@ -90,11 +90,15 @@ namespace UML_Editor.Nodes
         {
             base.Render(renderer);
             Children.OfType<IRenderableNode>().ToList().ForEach(x => x.Render(renderer));
-            FocusedNode?.Render(renderer);
+        }
+
+        public virtual void PrependNode(INode node)
+        {
+            Children.Insert(0, node);
         }
 
         public List<IFocusableNode> GetFocusableNodes() => Children.OfType<IFocusableNode>().ToList();
-        public List<INode> Children { get; set; } = new List<INode>();
+        public virtual List<INode> Children { get; set; } = new List<INode>();
         public IFocusableNode FocusedNode { get; set; }
         public EventHandler<NodeEventArgs> OnNodeAdd { get; set; }
         public EventHandler<NodeEventArgs> OnNodeRemoval { get; set; }

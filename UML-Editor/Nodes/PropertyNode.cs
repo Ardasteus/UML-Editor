@@ -112,18 +112,16 @@ namespace UML_Editor.Nodes
             }
         }
 
-        public virtual float GetWidth()
-        {
-            return AccessModifierButton.Width + NameTextBox.Width + Separator.Width + TypeTextBox.Width;
-        }
+        public virtual float GetWidth() => AccessModifierButton.Width + NameTextBox.Width + Separator.Width + TypeTextBox.Width;
 
         public void OnUnFocus(object sender, NodeEventArgs e)
         {
             FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+            OnMenuHide?.Invoke(this, EventArgs.Empty);
+            OnOptionsHide?.Invoke(this, EventArgs.Empty);
         }
         public override void OnNodeFocus(object sender, NodeEventArgs e)
         {
-            OnFocused?.Invoke(this, new NodeEventArgs(this));
             if (FocusedNode != e.Node && !(e.Node is ButtonNode))
             {
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
@@ -206,7 +204,6 @@ namespace UML_Editor.Nodes
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Regular", total_Width, Renderer.SingleTextHeight , () =>
                 {
                     Modifier = Modifiers.None;
-                    RemoveHitbox(OptionsMenu.TriggerAreas[0]);
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -214,7 +211,6 @@ namespace UML_Editor.Nodes
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Abstract", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     Modifier = Modifiers.Abstract;
-                    RemoveHitbox(OptionsMenu.TriggerAreas[0]);
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -222,7 +218,6 @@ namespace UML_Editor.Nodes
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     Modifier = Modifiers.Static;
-                    RemoveHitbox(OptionsMenu.TriggerAreas[0]);
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
                 RectangleRenderElementStyle.Default,
@@ -273,7 +268,7 @@ namespace UML_Editor.Nodes
             {
                 MenuPrefab.Position = AccessModifierButton.Position + new Vector(AccessModifierButton.Width, 0);
                 AccessModifierMenu = MenuPrefab;
-                Children.Add(AccessModifierMenu);
+                PrependNode(AccessModifierMenu);
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
                 AddHitbox(AccessModifierMenu.TriggerAreas[0]);
             }
@@ -293,7 +288,7 @@ namespace UML_Editor.Nodes
             {
                 OptionsMenu = OptionsPrefab;
                 AddHitbox(OptionsMenu.TriggerAreas[0]);
-                Children.Add(OptionsMenu);
+                PrependNode(OptionsMenu);
                 OnFocused?.Invoke(this, new NodeEventArgs(this));
                 AddHitbox(OptionsMenu.TriggerAreas[0]);
             }

@@ -67,8 +67,6 @@ namespace UML_Editor
         {
             ClassDiagramNode node = new ClassDiagramNode(structure, new BasicNodeStructure(structure.Position, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Default);
             node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
-            node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
-            node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
             node.AddNode(new MethodNode(new MethodStructure(Vector.Zero, "Prop", "Type", "Name : Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
             if (!Project.Classes.Contains(structure))
                 Project.AddClass(structure);
@@ -203,9 +201,7 @@ namespace UML_Editor
                     OptionsMenu = OptionsPrefab;
                 }
                 else
-                {
                     OptionsMenu = null;
-                }
             }
             else if(temp is ClassDiagramNode || temp is Relationship || temp is IOptionsNode)
             {
@@ -250,9 +246,7 @@ namespace UML_Editor
                 {
                     INode n = cn.Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
                     if (n == null)
-                    {
                         return mn;
-                    }
                     else
                         parent_node = n;
                 }
@@ -260,20 +254,14 @@ namespace UML_Editor
                 {
                     INode n = c.Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
                     if (n == null)
-                    {
                         return null;
-                    }
                     else
                         parent_node = n;
                 }
                 else if (parent_node is IFocusableNode m)
-                {
                     return m;
-                }
                 else
-                {
                     return null;
-                }
             }
             return null;
         }
