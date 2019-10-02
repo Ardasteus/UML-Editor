@@ -79,7 +79,12 @@ namespace UML_Editor
             if(FocusedNode != null)
             {
                 if (e.KeyChar != (char) 13)
-                    ((IKeyboardFocusableNode) GetLastFocusInHierarchy((ClassDiagramNode) FocusedNode)).OnKeyPress(this, e);
+                {
+                    IFocusableNode node = GetLastFocusInHierarchy((ClassDiagramNode) FocusedNode);
+                    if (node is IKeyboardFocusableNode kn)
+                        kn.OnKeyPress(this, e);
+
+                }
                 else
                     FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
             }
@@ -275,7 +280,7 @@ namespace UML_Editor
         private void GeneratePrefab()
         {
             float total_Width = Renderer.GetTextWidth(21);
-            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 2), RectangleRenderElementStyle.Default);
             OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Add a Diagram", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     AddDiagram(new ClassStructure(LastMousePos, "NewClass", "class", AccessModifiers.Public, Modifiers.None));
@@ -283,14 +288,9 @@ namespace UML_Editor
                 }),
                 RectangleRenderElementStyle.Default,
                 TextRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Abstract", total_Width, Renderer.SingleTextHeight, () =>
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Relationship", total_Width, Renderer.SingleTextHeight, () =>
                 {
-                    OptionsMenu = null;
-                }),
-                RectangleRenderElementStyle.Default,
-                TextRenderElementStyle.Default));
-            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Make Static", total_Width, Renderer.SingleTextHeight, () =>
-                {
+                    RelationshipManager.IsCreating = true;
                     OptionsMenu = null;
                 }),
                 RectangleRenderElementStyle.Default,
@@ -330,6 +330,7 @@ namespace UML_Editor
                 //OnFocused?.Invoke(this, new NodeEventArgs(this));
                 //OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode = (IFocusableNode)e.Node;
             }
         }

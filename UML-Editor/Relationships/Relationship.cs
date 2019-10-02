@@ -7,20 +7,22 @@ using UML_Editor.Nodes;
 using UML_Editor.Rendering;
 using UML_Editor.Rendering.RenderingElements;
 using System.Drawing;
+using UML_Editor.Enums;
+using UML_Editor.EventArguments;
 using UML_Editor.Hitboxes;
 using UML_Editor.Geometry;
+using UML_Editor.NodeStructure;
+using UML_Editor.ProjectStructure;
 using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Relationships
 {
-    public class Relationship //: IContainerNode, IOptionsNode
+    public class Relationship
     {
         public RelationshipSegment Origin { get; set; }
         public RelationshipSegment Target { get; set; }
         public string Name { get; set; }
-        public Vector Position { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
+
         public List<IHitbox> TriggerAreas { get; set; }
         public EventHandler<ResizeEventArgs> OnResize { get; set; }
         public EventHandler OnFocused { get; set; }
@@ -40,6 +42,8 @@ namespace UML_Editor.Relationships
             Target = new RelationshipSegment(vectors[1], vectors[4], vectors[2]);
             OriginNode.OnPositionChanged += OnPositionChanged;
             TargetNode.OnPositionChanged += OnPositionChanged;
+            OnOptionsHide += HideOptions;
+            OnOptionsShow += ShowOptions;
             GeneratePrefab();
             StealHitboxes();
         }
@@ -119,28 +123,30 @@ namespace UML_Editor.Relationships
 
         public void GeneratePrefab()
         {
-            //OptionsPrefab = new BasicContainerNode("cnt", Vector.Zero, 0, 0, RectangleRenderElementStyle.Default);
-            //OptionsPrefab.AddNode(new ButtonNode("btn1", "Test", Vector.Zero, Renderer.GetTextWidth(12), Renderer.SingleTextHeight, () =>
-            //{
-            //    OptionsMenu = null;
-            //    TriggerAreas.RemoveAt(1);
-            //    GeneratePrefab();
-            //},
-            //RectangleRenderElementStyle.Default));
+            float total_Width = Renderer.GetTextWidth(13);
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Add Property", total_Width, Renderer.SingleTextHeight, () =>
+                {
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                }),
+                RectangleRenderElementStyle.Default,
+                TextRenderElementStyle.Default));
         }
 
-        public void ShowOptionsMenu()
+        public void ShowOptions(object sender, EventArgs e)
         {
             if (OptionsMenu == null)
             {
-                TriggerAreas.Add(new RectangleHitbox(OptionsPrefab.Position, OptionsPrefab.Width, OptionsPrefab.Height));
                 OptionsMenu = OptionsPrefab;
+                OnFocused?.Invoke(this, new NodeEventArgs(OptionsMenu));
+                FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
             }
             else
-            {
-                TriggerAreas.RemoveAt(TriggerAreas.Count - 1);
-                OptionsMenu = null;
-            }
+                OnOptionsHide?.Invoke(this, e);
+        }
+        public void HideOptions(object sender, EventArgs e)
+        {
+            OptionsMenu = null;
         }
 
         public EventHandler OnOptionsShow { get; set; }
