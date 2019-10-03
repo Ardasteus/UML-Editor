@@ -61,7 +61,7 @@ namespace UML_Editor
         }
         public void AddDiagram(ClassStructure structure)
         {
-            ClassDiagramNode node = new ClassDiagramNode(structure, new BasicNodeStructure(structure.Position, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Default);
+            ClassDiagramNode node = new ClassDiagramNode(structure, new BasicNodeStructure(structure.Position, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Classes);
             node.AddNode(new PropertyNode(new PropertyStructure(Vector.Zero, "Prop", "Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
             node.AddNode(new MethodNode(new MethodStructure(Vector.Zero, "Method", "Type", "Name : Type", AccessModifiers.Public, Modifiers.None), new BasicNodeStructure(Vector.Zero, 0, Renderer.SingleTextHeight), RectangleRenderElementStyle.Textbox));
             if (!Project.Classes.Contains(structure))

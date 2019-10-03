@@ -55,15 +55,15 @@ namespace UML_Editor.Relationships
 
         public RelationshipSegment(Vector position, Vector joint, Vector anchor)
         {
-            SegmentStart = new LineRenderElement(position, joint, 1, Color.Black);
-            SegmentEnd = new LineRenderElement(joint, anchor, 1, Color.Black);
+            SegmentStart = new LineRenderElement(position, joint, 1, Color.White);
+            SegmentEnd = new LineRenderElement(joint, anchor, 1, Color.White);
             CreateHitboxes();
         }
         public void Render(Renderer renderer)
         {
             SegmentStart.Render(renderer);
             SegmentEnd.Render(renderer);
-            DebugRectangles.ForEach(x => x.BorderOnly(renderer));
+            //DebugRectangles.ForEach(x => x.BorderOnly(renderer));
         }
 
         private void CreateHitboxes()
