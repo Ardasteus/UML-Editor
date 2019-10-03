@@ -52,11 +52,6 @@ namespace UML_Editor.Relationships
                 CreateHitboxes();
             }
         }
-        public BasicContainerNode OptionsPrefab { get; set; }
-        public BasicContainerNode OptionsMenu { get; set; }
-        public bool isFocused { get; set; }
-        public EventHandler OnFocused { get; set; }
-        public EventHandler OnUnfocused { get; set; }
 
         public RelationshipSegment(Vector position, Vector joint, Vector anchor)
         {
@@ -68,7 +63,6 @@ namespace UML_Editor.Relationships
         {
             SegmentStart.Render(renderer);
             SegmentEnd.Render(renderer);
-            OptionsMenu?.Render(renderer);
             DebugRectangles.ForEach(x => x.BorderOnly(renderer));
         }
 

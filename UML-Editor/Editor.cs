@@ -28,6 +28,7 @@ namespace UML_Editor
         private BasicContainerNode OptionsPrefab;
         private BasicContainerNode OptionsMenu;
         public bool isFocused = false;
+        private Relationship focusedRelationship;
         private RelationshipManager RelationshipManager = new RelationshipManager();
         private ClassDiagramNode Dragged;
         private Relationship CurrentRelationship;
@@ -169,20 +170,27 @@ namespace UML_Editor
                 IFocusableNode node = SearchForClicked(temp, mouse_position);
                 if (node != null)
                 {
-                    node.OnFocused?.Invoke(this, new NodeEventArgs(node));
-                    if(node is IMouseFocusableNode mn)
-                        mn.OnMouseClick?.Invoke(this, e);
+                    if (node is Relationship r)
+                    {
+
+                    }
+                    else
+                    {
+                        node.OnFocused?.Invoke(this, new NodeEventArgs(node));
+                        if (node is IMouseFocusableNode mn)
+                            mn.OnMouseClick?.Invoke(this, e);
+                    }
                 }
             }
         }
         private void HandleRightClick(Vector mouse_position, MouseEventArgs e)
         {
             INode temp = Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
-            if (temp == null)
+            if(temp == null)
             {
                 temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             }
-            if(temp is ClassDiagramNode || temp is Relationship || temp is IOptionsNode)
+            if(temp != null)
             {
                 if(temp is ClassDiagramNode cn)
                 {
@@ -190,12 +198,12 @@ namespace UML_Editor
                     op.OptionsPrefab.Position = mouse_position;
                     op.OnOptionsShow?.Invoke(this, EventArgs.Empty);
                 }
-                else if (temp is Relationship r)
+                else if (temp is Relationship rs)
                 {
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
-                    r.OptionsPrefab.Position = mouse_position;
-                    r.OnOptionsShow?.Invoke(this, EventArgs.Empty);
-                    CurrentRelationship = r;
+                    rs.OptionsPrefab.Position = mouse_position;
+                    rs.OnOptionsShow?.Invoke(this, EventArgs.Empty);
+                    focusedRelationship = rs;
                 }
             }
             else
@@ -271,7 +279,7 @@ namespace UML_Editor
 
         private bool CheckIfClicked(Vector position, INode node)
         {
-            if(node is Relationship r)
+            if (node is Relationship r)
             {
                 foreach (IHitbox hitbox in r.TriggerAreas)
                 {
@@ -297,7 +305,7 @@ namespace UML_Editor
             {
                 OptionsMenu = OptionsPrefab;
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
-                CurrentRelationship?.OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                focusedRelationship?.OnOptionsHide?.Invoke(this, EventArgs.Empty);
             }
             else
                 OnOptionsHide?.Invoke(this, e);
@@ -358,7 +366,7 @@ namespace UML_Editor
                 //OnFocused?.Invoke(this, new NodeEventArgs(this));
                 //OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
-                CurrentRelationship?.OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                focusedRelationship?.OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode = (IFocusableNode)e.Node;
             }

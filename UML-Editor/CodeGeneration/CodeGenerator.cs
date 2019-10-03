@@ -24,7 +24,6 @@ namespace UML_Editor.CodeGeneration
             }
             foreach (ClassStructure klass in Project.Classes)
             {
-                string file = DirectoryPath + "\\" + klass.Name + ".cs";
                 Classes.Add(new ClassGenerator(klass));
             }
         }
@@ -34,7 +33,7 @@ namespace UML_Editor.CodeGeneration
             foreach (ClassGenerator gen in Classes)
             {
                 string file = DirectoryPath + "\\" + gen.ClassStructure.Name + ".cs";
-                Classes.ForEach(x => x.InsertLines(file));
+                gen.InsertLines(file);
             }
         }
     }
