@@ -21,6 +21,7 @@ namespace UML_Editor
         private List<ButtonNode> Buttons = new List<ButtonNode>();
         private PictureBox Plane;
         private int MaxProject = 5;
+        // TODO: Make this work again
         public EditorControler(PictureBox tab, PictureBox renderPlane)
         {
             //Buttons.Add(new ButtonNode("btn", "+", Vector.Zero, Renderer.SingleTextWidth, Renderer.SingleTextHeight, () =>
