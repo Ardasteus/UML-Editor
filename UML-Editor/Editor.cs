@@ -30,6 +30,7 @@ namespace UML_Editor
         public bool isFocused = false;
         private RelationshipManager RelationshipManager = new RelationshipManager();
         private ClassDiagramNode Dragged;
+        private Relationship CurrentRelationship;
         private Vector DraggingVector;
         private Vector LastMousePos;
         public string Directory = "C:\\Testing";
@@ -109,6 +110,7 @@ namespace UML_Editor
             }
             Render();
         }
+        // TODO: Drag only if nothing is clicked on
         public void OnMouseDown(object sender, MouseEventArgs e)
         {
             Vector mouse_position = (Vector)e.Location / Renderer.Scale - Renderer.Origin;
@@ -154,8 +156,8 @@ namespace UML_Editor
             INode temp = null;
             if (OptionsMenu != null && CheckIfClicked(mouse_position, OptionsMenu))
                 temp = OptionsMenu;
-            //else if (RelationshipManager.Relationships.Count > 0 && RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x)) != null)
-            //    temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
+            else if (RelationshipManager.Relationships.Count > 0 && RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x)) != null)
+                temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             else
                 temp = Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             if (RelationshipManager.IsCreating && temp != null && temp is ClassDiagramNode cn)
@@ -178,10 +180,9 @@ namespace UML_Editor
             INode temp = Children.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             if (temp == null)
             {
-                OptionsPrefab.Position = mouse_position;
-                OnOptionsShow?.Invoke(this, EventArgs.Empty);
+                temp = RelationshipManager.Relationships.FirstOrDefault(x => CheckIfClicked(mouse_position, x));
             }
-            else if(temp is ClassDiagramNode || temp is Relationship || temp is IOptionsNode)
+            if(temp is ClassDiagramNode || temp is Relationship || temp is IOptionsNode)
             {
                 if(temp is ClassDiagramNode cn)
                 {
@@ -189,6 +190,18 @@ namespace UML_Editor
                     op.OptionsPrefab.Position = mouse_position;
                     op.OnOptionsShow?.Invoke(this, EventArgs.Empty);
                 }
+                else if (temp is Relationship r)
+                {
+                    OnOptionsHide?.Invoke(this, EventArgs.Empty);
+                    r.OptionsPrefab.Position = mouse_position;
+                    r.OnOptionsShow?.Invoke(this, EventArgs.Empty);
+                    CurrentRelationship = r;
+                }
+            }
+            else
+            {
+                OptionsPrefab.Position = mouse_position;
+                OnOptionsShow?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -230,6 +243,8 @@ namespace UML_Editor
                 }
                 else if (parent_node is IFocusableNode m)
                     return m;
+                else if(parent_node is Relationship r && r.OptionsMenu != null)
+                    parent_node = r.OptionsMenu;
                 else
                     return null;
             }
@@ -256,10 +271,21 @@ namespace UML_Editor
 
         private bool CheckIfClicked(Vector position, INode node)
         {
-            foreach  (IHitbox hitbox in node.TriggerAreas)
+            if(node is Relationship r)
             {
-                if (hitbox.HasTriggered(position))
-                    return true;
+                foreach (IHitbox hitbox in r.TriggerAreas)
+                {
+                    if (hitbox.HasTriggered(position))
+                        return true;
+                }
+            }
+            else
+            {
+                foreach (IHitbox hitbox in node.TriggerAreas)
+                {
+                    if (hitbox.HasTriggered(position))
+                        return true;
+                }
             }
             return false;
         }
@@ -271,6 +297,7 @@ namespace UML_Editor
             {
                 OptionsMenu = OptionsPrefab;
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                CurrentRelationship?.OnOptionsHide?.Invoke(this, EventArgs.Empty);
             }
             else
                 OnOptionsHide?.Invoke(this, e);
@@ -307,15 +334,6 @@ namespace UML_Editor
                 TextRenderElementStyle.Default));
         }
 
-        private void GenerateCode()
-        {
-            foreach (ClassDiagramNode classNode in Children.OfType<ClassDiagramNode>())
-            {
-                //CodeGenerator generator = new CodeGenerator("D:\\Testing\\" + classNode.NameTextBox.Text + ".cs", classNode);
-                //generator.GenerateClass();
-            }
-        }
-
         public void OnMouseWheel(object sender, MouseEventArgs e)
         {
             float PreviousScale = Renderer.Scale;
@@ -340,6 +358,7 @@ namespace UML_Editor
                 //OnFocused?.Invoke(this, new NodeEventArgs(this));
                 //OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                CurrentRelationship?.OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 FocusedNode = (IFocusableNode)e.Node;
             }

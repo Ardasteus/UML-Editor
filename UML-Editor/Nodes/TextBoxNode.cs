@@ -22,7 +22,7 @@ namespace UML_Editor.Nodes
         {
             TriggerAreas.Add(new RectangleHitbox(Position, Width, Height));
             OnKeyPress += HandleKey;
-            OnFocused += (sender, args) => FillColor = Color.Blue;
+            OnFocused += (sender, args) => FillColor = Color.Beige;
             OnUnfocused += (sender, args) => FillColor = Color.White;
         }
 

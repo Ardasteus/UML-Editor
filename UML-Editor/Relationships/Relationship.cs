@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UML_Editor.Nodes;
-using UML_Editor.Rendering;
-using UML_Editor.Rendering.RenderingElements;
-using System.Drawing;
-using UML_Editor.Enums;
 using UML_Editor.EventArguments;
-using UML_Editor.Hitboxes;
 using UML_Editor.Geometry;
+using UML_Editor.Hitboxes;
+using UML_Editor.Nodes;
 using UML_Editor.NodeStructure;
-using UML_Editor.ProjectStructure;
+using UML_Editor.Rendering;
 using UML_Editor.Rendering.ElementStyles;
 
 namespace UML_Editor.Relationships
 {
-    public class Relationship
+    public class Relationship : INode
     {
         public RelationshipSegment Origin { get; set; }
         public RelationshipSegment Target { get; set; }
@@ -33,7 +26,7 @@ namespace UML_Editor.Relationships
 
         private ClassDiagramNode OriginNode;
         private ClassDiagramNode TargetNode;
-        public Relationship(ClassDiagramNode origin, ClassDiagramNode target)
+        public Relationship(ClassDiagramNode origin, ClassDiagramNode target) : base()
         {
             OriginNode = origin;
             TargetNode = target;
@@ -124,8 +117,8 @@ namespace UML_Editor.Relationships
         public void GeneratePrefab()
         {
             float total_Width = Renderer.GetTextWidth(13);
-            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 3), RectangleRenderElementStyle.Default);
-            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Add Property", total_Width, Renderer.SingleTextHeight, () =>
+            OptionsPrefab = new BasicContainerNode(new BasicNodeStructure(Vector.Zero, total_Width, Renderer.SingleTextHeight * 1), RectangleRenderElementStyle.Default);
+            OptionsPrefab.AddNode(new ButtonNode(new ButtonStructure(Vector.Zero, "Test Button", total_Width, Renderer.SingleTextHeight, () =>
                 {
                     OnOptionsHide?.Invoke(this, EventArgs.Empty);
                 }),
@@ -140,12 +133,14 @@ namespace UML_Editor.Relationships
                 OptionsMenu = OptionsPrefab;
                 OnFocused?.Invoke(this, new NodeEventArgs(OptionsMenu));
                 FocusedNode?.OnUnfocused?.Invoke(this, new NodeEventArgs(FocusedNode));
+                TriggerAreas.Add(OptionsMenu.TriggerAreas[0]);
             }
             else
                 OnOptionsHide?.Invoke(this, e);
         }
         public void HideOptions(object sender, EventArgs e)
         {
+            TriggerAreas.Remove(OptionsMenu.TriggerAreas[0]);
             OptionsMenu = null;
         }
 
@@ -153,5 +148,11 @@ namespace UML_Editor.Relationships
         public EventHandler OnOptionsHide { get; set; }
 
         public EventHandler OnMouseClick { get; set; }
+        public Vector Position { get; set; }
+        public float Width { get; set; }
+        public float Height { get; set; }
+        EventHandler<PositionEventArgs> INode.OnPositionChanged { get; set; }
+        public EventHandler OnChange { get; set; }
+        public EventHandler<NodeEventArgs> OnRemoval { get; set; }
     }
 }
