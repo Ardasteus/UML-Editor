@@ -154,7 +154,6 @@ namespace UML_Editor.Relationships
         public Vector Position { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
-        EventHandler<PositionEventArgs> INode.OnPositionChanged { get; set; }
         public EventHandler OnChange { get; set; }
         public EventHandler<NodeEventArgs> OnRemoval { get; set; }
     }

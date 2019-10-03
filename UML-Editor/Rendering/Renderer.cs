@@ -16,7 +16,7 @@ namespace UML_Editor.Rendering
         public Vector Origin { get; set; }
         private float width;
         private float height;
-        public Color ClearColor = Color.Transparent;
+        public Color ClearColor = Color.SlateGray;
         public float Scale { get; set; } = 1f;
         public Renderer(PictureBox pic)
         {
